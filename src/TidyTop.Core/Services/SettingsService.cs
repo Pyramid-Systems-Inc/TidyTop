@@ -203,20 +203,18 @@ public class SettingsService : ISettingsService
     {
         return new DesktopSettings
         {
-            Theme = ThemeMode.System,
-            AutoArrangeIcons = false,
-            ShowDesktopIcons = true,
-            SnapToGrid = true,
-            GridSize = 16,
-            IconSpacing = 8,
-            FenceOpacity = 0.8,
-            FenceBorderColor = "#808080",
-            FenceBackgroundColor = "#F0F0F0",
-            QuickHideEnabled = true,
+            Theme = ApplicationTheme.System,
+            DefaultFenceOpacity = 0.8,
+            DefaultFenceBorderColor = System.Drawing.Color.FromArgb(200, 128, 128, 128),
+            DefaultFenceBackgroundColor = System.Drawing.Color.FromArgb(200, 240, 240, 240),
+            EnableQuickHide = true,
             QuickHideHotkey = "Ctrl+Space",
-            AutoOrganizationEnabled = false,
-            AnimationEnabled = true,
-            AnimationSpeed = 300
+            EnableAutoOrganize = false,
+            EnableAnimations = true,
+            AnimationSpeed = 300,
+            EnableGridSnapping = true,
+            GridSize = 16,
+            DefaultIconSpacing = 8
         };
     }
 

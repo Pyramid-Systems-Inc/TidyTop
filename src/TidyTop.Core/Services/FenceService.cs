@@ -58,7 +58,8 @@ public class FenceService : IFenceService
         if (fence == null)
             throw new ArgumentNullException(nameof(fence));
 
-        var result = _fences.TryUpdate(fence.Id, fence, _fences[fence.Id]);
+        var fenceId = Guid.Parse(fence.Id);
+        var result = _fences.TryUpdate(fenceId, fence, _fences[fenceId]);
         return Task.FromResult(result);
     }
 
