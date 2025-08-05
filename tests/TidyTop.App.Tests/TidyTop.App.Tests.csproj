@@ -20,4 +20,9 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\TidyTop.App\TidyTop.App.csproj" />
+    <ProjectReference Include="..\..\src\TidyTop.Core\TidyTop.Core.csproj" />
+  </ItemGroup>
+
 </Project>
