@@ -6,6 +6,7 @@ using Avalonia.Platform;
 using Avalonia.Threading;
 using System;
 using System.Linq;
+using System.Reactive;
 using TidyTop.App.ViewModels;
 using TidyTop.Core.Models;
 
@@ -16,8 +17,8 @@ public partial class MainWindow : Window
     private MainWindowViewModel ViewModel => DataContext as MainWindowViewModel;
     private bool _isDragging;
     private Point _dragStartPoint;
-    private Fence _draggedFence;
-    private DesktopIcon _draggedIcon;
+    private Fence? _draggedFence;
+    private DesktopIcon? _draggedIcon;
 
     public MainWindow()
     {
@@ -45,7 +46,7 @@ public partial class MainWindow : Window
         
         // Make window transparent and click-through
         Background = Avalonia.Media.Brushes.Transparent;
-        TransparencyLevelHint = WindowTransparencyLevel.Transparent;
+        TransparencyLevelHint = new[] { WindowTransparencyLevel.Transparent };
         
         // Keep window on top
         Topmost = true;
@@ -71,8 +72,7 @@ public partial class MainWindow : Window
         {
             if (ViewModel != null)
             {
-                // Toggle control panel visibility
-                // This property needs to be added to the ViewModel
+                ViewModel.ToggleControlPanelCommand.Execute(Unit.Default);
             }
         }
     }
@@ -90,8 +90,9 @@ public partial class MainWindow : Window
             var deltaX = currentPosition.X - _dragStartPoint.X;
             var deltaY = currentPosition.Y - _dragStartPoint.Y;
             
-            _draggedFence.X += deltaX;
-            _draggedFence.Y += deltaY;
+            _draggedFence.Position = new Point(
+                _draggedFence.Position.X + deltaX,
+                _draggedFence.Position.Y + deltaY);
             
             _dragStartPoint = currentPosition;
         }
@@ -142,7 +143,10 @@ public partial class MainWindow : Window
                 
             case Key.Escape:
                 // Hide control panel
-                // This property needs to be added to the ViewModel
+                if (ViewModel != null && ViewModel.ShowControlPanel)
+                {
+                    ViewModel.ToggleControlPanelCommand.Execute(Unit.Default);
+                }
                 break;
         }
     }
@@ -296,13 +300,13 @@ public partial class MainWindow : Window
     {
         try
         {
-            if (!string.IsNullOrEmpty(icon.Path))
+            if (!string.IsNullOrEmpty(icon.FullPath))
             {
                 var process = new System.Diagnostics.Process
                 {
                     StartInfo = new System.Diagnostics.ProcessStartInfo
                     {
-                        FileName = icon.Path,
+                        FileName = icon.FullPath,
                         UseShellExecute = true
                     }
                 };

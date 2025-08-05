@@ -1,9 +1,11 @@
 using System;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Reactive;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Platform;
 using Avalonia.Threading;
 using ReactiveUI;
@@ -21,10 +23,10 @@ public class MainWindowViewModel : ViewModelBase
     
     private bool _isVisible;
     private double _opacity;
-    private ObservableCollection<DesktopIcon> _desktopIcons;
-    private ObservableCollection<Fence> _fences;
-    private DesktopLayout _currentLayout;
-    private DesktopSettings _settings;
+    private ObservableCollection<DesktopIcon> _desktopIcons = new();
+    private ObservableCollection<Fence> _fences = new();
+    private DesktopLayout? _currentLayout;
+    private DesktopSettings? _settings;
     private bool _showControlPanel;
 
     public MainWindowViewModel(
@@ -176,14 +178,10 @@ public class MainWindowViewModel : ViewModelBase
     {
         var newFence = new Fence
         {
-            Id = Guid.NewGuid(),
-            Name = $"New Fence {Fences.Count + 1}",
-            X = 100,
-            Y = 100,
-            Width = 200,
-            Height = 150,
+            Title = $"New Fence {Fences.Count + 1}",
+            Position = new Point(100, 100),
+            Size = new Size(200, 150),
             IsVisible = true,
-            LayoutId = CurrentLayout?.Id ?? Guid.Empty,
             CreatedDate = DateTime.Now,
             ModifiedDate = DateTime.Now
         };
@@ -199,12 +197,9 @@ public class MainWindowViewModel : ViewModelBase
             {
                 CurrentLayout = new DesktopLayout
                 {
-                    Id = Guid.NewGuid(),
                     Name = "Default Layout",
                     CreatedDate = DateTime.Now,
-                    ModifiedDate = DateTime.Now,
-                    ScreenWidth = (int)GetScreenSize().Width,
-                    ScreenHeight = (int)GetScreenSize().Height
+                    ModifiedDate = DateTime.Now
                 };
             }
             

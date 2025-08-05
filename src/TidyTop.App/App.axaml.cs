@@ -3,6 +3,9 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using System;
 using TidyTop.App.Services;
+using TidyTop.App.Views;
+using TidyTop.App.ViewModels;
+using TidyTop.Core.Services;
 
 namespace TidyTop.App;
 
@@ -23,18 +26,18 @@ public partial class App : Application
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             // Create the main window with dependency injection support
-            var mainWindow = new MainWindow();
+            var mainWindow = new Views.MainWindow();
             
             // Set the data context with services if needed
             if (AppHost != null)
             {
-                // TODO: Set up the main window's data context with required services
-                // For example:
-                // mainWindow.DataContext = new MainViewModel(
-                //     AppHost.GetService<ISettingsService>(),
-                //     AppHost.GetService<IDesktopIconService>(),
-                //     AppHost.GetService<IFenceService>(),
-                //     AppHost.GetService<IDesktopLayoutService>());
+                var viewModel = new MainWindowViewModel(
+                    AppHost.GetService<IDesktopIconService>(),
+                    AppHost.GetService<IFenceService>(),
+                    AppHost.GetService<IDesktopLayoutService>(),
+                    AppHost.GetService<ISettingsService>());
+                
+                mainWindow.DataContext = viewModel;
             }
             
             desktop.MainWindow = mainWindow;

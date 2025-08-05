@@ -7,9 +7,9 @@ namespace TidyTop.App.ViewModels;
 public class ViewModelBase : ReactiveObject, IDisposable
 {
     private bool _isBusy;
-    private string _statusMessage;
+    private string _statusMessage = string.Empty;
     private bool _hasErrors;
-    private string _errorMessage;
+    private string _errorMessage = string.Empty;
 
     public bool IsBusy
     {

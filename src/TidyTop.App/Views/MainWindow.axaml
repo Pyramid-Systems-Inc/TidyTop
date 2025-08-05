@@ -16,7 +16,8 @@
         CanResize="False"
         ShowInTaskbar="False"
         Topmost="True"
-        Focusable="True">
+        Focusable="True"
+        HitTestVisible="False">
     
     <Window.Styles>
         <Style Selector="Window">
@@ -41,19 +42,20 @@
             
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Border Width="{Binding Width}" 
-                            Height="{Binding Height}"
+                    <Border Width="{Binding Size.Width}"
+                            Height="{Binding Size.Height}"
                             Background="{Binding BackgroundColor}"
                             BorderBrush="{Binding BorderColor}"
-                            BorderThickness="{Binding BorderThickness}"
-                            CornerRadius="5"
+                            BorderThickness="{Binding BorderWidth}"
+                            CornerRadius="{Binding CornerRadius}"
                             Opacity="{Binding Opacity}"
-                            IsVisible="{Binding IsVisible}">
+                            IsVisible="{Binding IsVisible}"
+                            HitTestVisible="True">
                         <Canvas.Left>
-                            <Binding Path="X"/>
+                            <Binding Path="Position.X"/>
                         </Canvas.Left>
                         <Canvas.Top>
-                            <Binding Path="Y"/>
+                            <Binding Path="Position.Y"/>
                         </Canvas.Top>
                         
                         <Grid>
@@ -69,9 +71,9 @@
                                     Padding="5"
                                     MouseDown="OnFenceHeaderMouseDown"
                                     Tag="{Binding .}">
-                                <TextBlock Text="{Binding Name}" 
+                                <TextBlock Text="{Binding Title}"
                                            FontWeight="Bold"
-                                           Foreground="{Binding TextColor}"/>
+                                           Foreground="{Binding TitleColor}"/>
                             </Border>
                             
                             <!-- Fence Content Area -->
@@ -86,19 +88,20 @@
                                 
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Width="48" 
-                                                Height="48" 
+                                        <Border Width="48"
+                                                Height="48"
                                                 Margin="2"
                                                 Background="Transparent"
                                                 CornerRadius="3"
                                                 PointerPressed="OnIconPointerPressed"
-                                                Tag="{Binding .}">
+                                                Tag="{Binding .}"
+                                                HitTestVisible="True">
                                             <Grid>
-                                                <Image Source="{Binding IconPath}" 
+                                                <Image Source="{Binding Icon}"
                                                        Stretch="Uniform"
-                                                       Width="32" 
+                                                       Width="32"
                                                        Height="32"/>
-                                                <TextBlock Text="{Binding Name}" 
+                                                <TextBlock Text="{Binding Name}"
                                                            FontSize="10"
                                                            TextWrapping="Wrap"
                                                            TextAlignment="Center"
@@ -117,10 +120,11 @@
         </ItemsControl>
         
         <!-- Control Panel (initially hidden) -->
-        <Panel IsVisible="{Binding ShowControlPanel}" 
-               HorizontalAlignment="Right" 
+        <Panel IsVisible="{Binding ShowControlPanel}"
+               HorizontalAlignment="Right"
                VerticalAlignment="Top"
-               Margin="10">
+               Margin="10"
+               HitTestVisible="True">
             <Border Background="White" 
                     CornerRadius="5" 
                     Padding="10"
