@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-This document outlines a comprehensive strategy for migrating the legacy Visual Basic .NET desktop organizer application ("Shortcutter") to a modern technology stack. The current application is a Windows Forms-based application that allows users to organize and launch file shortcuts with customizable views.
+This document outlines a comprehensive strategy for migrating the legacy Visual Basic .NET desktop organizer application ("Shortcutter") to a modern technology stack. The current application is a Windows Forms-based application that allows users to organize and launch file shortcuts with customizable views. The new application, "TidyTop," will be transformed into a desktop organization tool similar to Fences, allowing users to organize desktop icons into customizable fenced areas.
 
 ## Current Application Analysis
 
@@ -19,6 +19,16 @@ This document outlines a comprehensive strategy for migrating the legacy Visual 
 3. **Customization**: Supports color themes and window sizing
 4. **Settings Persistence**: Saves user preferences and view configurations
 5. **Backup Functionality**: Creates desktop shortcuts for saved views
+
+### Target Features for TidyTop
+1. **Desktop Fences**: Create customizable fenced areas on the desktop to organize icons
+2. **Icon Management**: Drag and drop desktop icons between fences
+3. **Layout Persistence**: Save and restore desktop layouts
+4. **Quick Hide**: Show/hide fences to reveal a clean desktop
+5. **Auto-Organization**: Automatically sort icons within fences by name, type, or date
+6. **Customization**: Customize fence appearance, colors, and transparency
+7. **Rules Engine**: Create rules to automatically place new icons in specific fences
+8. **Desktop Portals**: Create portals to folders on the desktop
 
 ### Technical Components
 - **Main Form**: Form1.vb - Contains all application logic
@@ -108,10 +118,10 @@ This document outlines a comprehensive strategy for migrating the legacy Visual 
    - Implement basic navigation
 
 2. **Core Features**
-   - Implement file listing functionality
-   - Add folder selection and management
-   - Implement shortcut launching
-   - Add basic settings management
+   - Implement desktop overlay system for fences
+   - Add fence creation and management
+   - Implement icon organization within fences
+   - Add desktop layout persistence
 
 3. **UI Implementation**
    - Design and implement main interface
@@ -122,10 +132,10 @@ This document outlines a comprehensive strategy for migrating the legacy Visual 
 ### Phase 3: Advanced Features and Refinement (4-6 weeks)
 
 1. **Advanced Features**
-   - Implement view customization
-   - Add backup functionality
-   - Implement import/export of settings
-   - Add search and filtering capabilities
+   - Implement fence customization (colors, transparency, labels)
+   - Add quick hide/show functionality
+   - Implement auto-organization rules
+   - Add desktop portal functionality
 
 2. **Performance Optimization**
    - Optimize file loading performance
@@ -407,6 +417,8 @@ This document outlines a comprehensive strategy for migrating the legacy Visual 
 ## Conclusion
 
 Migrating your Visual Basic .NET desktop organizer application to a modern technology stack is a significant undertaking that offers substantial benefits in terms of maintainability, performance, and user experience. The recommended approach is to migrate to a cross-platform desktop application using .NET 6/7/8 with Avalonia UI or MAUI, which provides the best balance of modern features while preserving the desktop application experience.
+
+The new TidyTop application will transform from a simple shortcut organizer into a comprehensive desktop organization tool similar to Fences® 6, providing users with powerful desktop management capabilities while maintaining the core functionality of the original application.
 
 Key success factors include:
 - Thorough analysis and planning before implementation

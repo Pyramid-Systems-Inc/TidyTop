@@ -19,4 +19,9 @@
       <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
     </PackageReference>
   </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TidyTop.Core\TidyTop.Core.csproj" />
+    <ProjectReference Include="..\TidyTop.Data\TidyTop.Data.csproj" />
+  </ItemGroup>
 </Project>
