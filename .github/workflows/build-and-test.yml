@@ -1,0 +1,49 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+        
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build
+      run: dotnet build --no-restore
+      
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
+      
+    - name: Publish Windows App
+      if: matrix.os == 'windows-latest'
+      run: dotnet publish src/TidyTop.App/TidyTop.App.csproj -c Release -r win-x64 -o ./publish/windows
+      
+    - name: Publish macOS App
+      if: matrix.os == 'macos-latest'
+      run: dotnet publish src/TidyTop.App/TidyTop.App.csproj -c Release -r osx-x64 -o ./publish/macos
+      
+    - name: Publish Linux App
+      if: matrix.os == 'ubuntu-latest'
+      run: dotnet publish src/TidyTop.App/TidyTop.App.csproj -c Release -r linux-x64 -o ./publish/linux
+      
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: published-app-${{ matrix.os }}
+        path: ./publish/
