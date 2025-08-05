@@ -1,0 +1,226 @@
+using System;
+using System.Collections.ObjectModel;
+using System.Reactive;
+using System.Threading.Tasks;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Platform;
+using Avalonia.Threading;
+using ReactiveUI;
+using TidyTop.Core.Models;
+using TidyTop.Core.Services;
+
+namespace TidyTop.App.ViewModels;
+
+public class MainWindowViewModel : ViewModelBase
+{
+    private readonly IDesktopIconService _desktopIconService;
+    private readonly IFenceService _fenceService;
+    private readonly IDesktopLayoutService _desktopLayoutService;
+    private readonly ISettingsService _settingsService;
+    
+    private bool _isVisible;
+    private double _opacity;
+    private ObservableCollection<DesktopIcon> _desktopIcons;
+    private ObservableCollection<Fence> _fences;
+    private DesktopLayout _currentLayout;
+    private DesktopSettings _settings;
+
+    public MainWindowViewModel(
+        IDesktopIconService desktopIconService,
+        IFenceService fenceService,
+        IDesktopLayoutService desktopLayoutService,
+        ISettingsService settingsService)
+    {
+        _desktopIconService = desktopIconService;
+        _fenceService = fenceService;
+        _desktopLayoutService = desktopLayoutService;
+        _settingsService = settingsService;
+
+        // Initialize commands
+        ToggleVisibilityCommand = ReactiveCommand.Create(ToggleVisibility);
+        RefreshDesktopCommand = ReactiveCommand.CreateFromTask(RefreshDesktopAsync);
+        CreateFenceCommand = ReactiveCommand.Create(CreateNewFence);
+        SaveLayoutCommand = ReactiveCommand.CreateFromTask(SaveCurrentLayoutAsync);
+        
+        // Initialize collections
+        DesktopIcons = new ObservableCollection<DesktopIcon>();
+        Fences = new ObservableCollection<Fence>();
+        
+        // Set initial state
+        IsVisible = true;
+        Opacity = 0.7; // Semi-transparent by default
+        
+        // Load settings and layout
+        InitializeAsync();
+    }
+
+    public bool IsVisible
+    {
+        get => _isVisible;
+        set => this.RaiseAndSetIfChanged(ref _isVisible, value);
+    }
+
+    public double Opacity
+    {
+        get => _opacity;
+        set => this.RaiseAndSetIfChanged(ref _opacity, value);
+    }
+
+    public ObservableCollection<DesktopIcon> DesktopIcons
+    {
+        get => _desktopIcons;
+        set => this.RaiseAndSetIfChanged(ref _desktopIcons, value);
+    }
+
+    public ObservableCollection<Fence> Fences
+    {
+        get => _fences;
+        set => this.RaiseAndSetIfChanged(ref _fences, value);
+    }
+
+    public DesktopLayout CurrentLayout
+    {
+        get => _currentLayout;
+        set => this.RaiseAndSetIfChanged(ref _currentLayout, value);
+    }
+
+    public DesktopSettings Settings
+    {
+        get => _settings;
+        set => this.RaiseAndSetIfChanged(ref _settings, value);
+    }
+
+    public ReactiveCommand<Unit, Unit> ToggleVisibilityCommand { get; }
+    public ReactiveCommand<Unit, Unit> RefreshDesktopCommand { get; }
+    public ReactiveCommand<Unit, Unit> CreateFenceCommand { get; }
+    public ReactiveCommand<Unit, Unit> SaveLayoutCommand { get; }
+
+    private async void InitializeAsync()
+    {
+        try
+        {
+            // Load settings
+            Settings = await _settingsService.LoadSettingsAsync() ?? new DesktopSettings();
+            
+            // Apply settings
+            Opacity = Settings.Opacity;
+            
+            // Load current layout
+            CurrentLayout = await _desktopLayoutService.LoadCurrentLayoutAsync();
+            
+            if (CurrentLayout != null)
+            {
+                // Load fences for this layout
+                var fences = await _fenceService.GetFencesByLayoutIdAsync(CurrentLayout.Id);
+                Fences.Clear();
+                foreach (var fence in fences)
+                {
+                    Fences.Add(fence);
+                }
+                
+                // Load desktop icons
+                var icons = await _desktopIconService.GetDesktopIconsAsync();
+                DesktopIcons.Clear();
+                foreach (var icon in icons)
+                {
+                    DesktopIcons.Add(icon);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log error or handle initialization failure
+            Console.WriteLine($"Failed to initialize application: {ex.Message}");
+        }
+    }
+
+    private void ToggleVisibility()
+    {
+        IsVisible = !IsVisible;
+    }
+
+    private async Task RefreshDesktopAsync()
+    {
+        try
+        {
+            var icons = await _desktopIconService.GetDesktopIconsAsync();
+            DesktopIcons.Clear();
+            foreach (var icon in icons)
+            {
+                DesktopIcons.Add(icon);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to refresh desktop: {ex.Message}");
+        }
+    }
+
+    private void CreateNewFence()
+    {
+        var newFence = new Fence
+        {
+            Id = Guid.NewGuid(),
+            Name = $"New Fence {Fences.Count + 1}",
+            X = 100,
+            Y = 100,
+            Width = 200,
+            Height = 150,
+            IsVisible = true,
+            LayoutId = CurrentLayout?.Id ?? Guid.Empty,
+            CreatedDate = DateTime.Now,
+            ModifiedDate = DateTime.Now
+        };
+        
+        Fences.Add(newFence);
+    }
+
+    private async Task SaveCurrentLayoutAsync()
+    {
+        try
+        {
+            if (CurrentLayout == null)
+            {
+                CurrentLayout = new DesktopLayout
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Default Layout",
+                    CreatedDate = DateTime.Now,
+                    ModifiedDate = DateTime.Now,
+                    ScreenWidth = (int)GetScreenSize().Width,
+                    ScreenHeight = (int)GetScreenSize().Height
+                };
+            }
+            
+            // Update layout with current fences and icons
+            CurrentLayout.Fences = Fences.ToList();
+            CurrentLayout.Icons = DesktopIcons.ToList();
+            CurrentLayout.ModifiedDate = DateTime.Now;
+            
+            await _desktopLayoutService.SaveLayoutAsync(CurrentLayout);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to save layout: {ex.Message}");
+        }
+    }
+
+    private Size GetScreenSize()
+    {
+        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            if (desktop.MainWindow?.Screens.Primary is { } screen)
+            {
+                return new Size(screen.WorkingArea.Width, screen.WorkingArea.Height);
+            }
+        }
+        
+        return new Size(1920, 1080); // Default fallback
+    }
+
+    public void Dispose()
+    {
+        // Clean up resources if needed
+    }
+}
