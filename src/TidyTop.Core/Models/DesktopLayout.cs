@@ -95,7 +95,7 @@ namespace TidyTop.Core.Models
         {
             return new Fence
             {
-                Id = Guid.NewGuid(),
+                Id = Guid.NewGuid().ToString(),
                 Title = fence.Title,
                 Position = fence.Position,
                 Size = fence.Size,
