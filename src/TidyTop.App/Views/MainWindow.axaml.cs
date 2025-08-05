@@ -90,9 +90,9 @@ public partial class MainWindow : Window
             var deltaX = currentPosition.X - _dragStartPoint.X;
             var deltaY = currentPosition.Y - _dragStartPoint.Y;
             
-            _draggedFence.Position = new Point(
-                _draggedFence.Position.X + deltaX,
-                _draggedFence.Position.Y + deltaY);
+            _draggedFence.Position = new System.Drawing.Point(
+                _draggedFence.Position.X + (int)deltaX,
+                _draggedFence.Position.Y + (int)deltaY);
             
             _dragStartPoint = currentPosition;
         }
@@ -102,8 +102,9 @@ public partial class MainWindow : Window
             var deltaX = currentPosition.X - _dragStartPoint.X;
             var deltaY = currentPosition.Y - _dragStartPoint.Y;
             
-            _draggedIcon.X += deltaX;
-            _draggedIcon.Y += deltaY;
+            _draggedIcon.Position = new System.Drawing.Point(
+                _draggedIcon.Position.X + (int)deltaX,
+                _draggedIcon.Position.Y + (int)deltaY);
             
             _dragStartPoint = currentPosition;
         }

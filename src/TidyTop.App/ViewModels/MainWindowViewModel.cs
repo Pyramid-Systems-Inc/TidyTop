@@ -113,18 +113,18 @@ public class MainWindowViewModel : ViewModelBase
         try
         {
             // Load settings
-            Settings = await _settingsService.LoadSettingsAsync() ?? new DesktopSettings();
+            Settings = await _settingsService.GetSettingsAsync() ?? new DesktopSettings();
             
             // Apply settings
-            Opacity = Settings.Opacity;
+            Opacity = Settings.DefaultFenceOpacity;
             
             // Load current layout
-            CurrentLayout = await _desktopLayoutService.LoadCurrentLayoutAsync();
+            CurrentLayout = await _desktopLayoutService.GetCurrentLayoutAsync();
             
             if (CurrentLayout != null)
             {
-                // Load fences for this layout
-                var fences = await _fenceService.GetFencesByLayoutIdAsync(CurrentLayout.Id);
+                // Load fences
+                var fences = await _fenceService.GetFencesAsync();
                 Fences.Clear();
                 foreach (var fence in fences)
                 {
@@ -179,8 +179,8 @@ public class MainWindowViewModel : ViewModelBase
         var newFence = new Fence
         {
             Title = $"New Fence {Fences.Count + 1}",
-            Position = new Point(100, 100),
-            Size = new Size(200, 150),
+            Position = new System.Drawing.Point(100, 100),
+            Size = new System.Drawing.Size(200, 150),
             IsVisible = true,
             CreatedDate = DateTime.Now,
             ModifiedDate = DateTime.Now
@@ -205,10 +205,10 @@ public class MainWindowViewModel : ViewModelBase
             
             // Update layout with current fences and icons
             CurrentLayout.Fences = Fences.ToList();
-            CurrentLayout.Icons = DesktopIcons.ToList();
+            CurrentLayout.UnfencedIcons = DesktopIcons.ToList();
             CurrentLayout.ModifiedDate = DateTime.Now;
             
-            await _desktopLayoutService.SaveLayoutAsync(CurrentLayout);
+            await _desktopLayoutService.UpdateLayoutAsync(CurrentLayout);
         }
         catch (Exception ex)
         {
@@ -216,17 +216,17 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
 
-    private Size GetScreenSize()
+    private System.Drawing.Size GetScreenSize()
     {
         if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             if (desktop.MainWindow?.Screens.Primary is { } screen)
             {
-                return new Size(screen.WorkingArea.Width, screen.WorkingArea.Height);
+                return new System.Drawing.Size(screen.WorkingArea.Width, screen.WorkingArea.Height);
             }
         }
         
-        return new Size(1920, 1080); // Default fallback
+        return new System.Drawing.Size(1920, 1080); // Default fallback
     }
 
 }
