@@ -41,7 +41,7 @@ public class DesktopIconService : IDesktopIconService
         if (icon == null)
             throw new ArgumentNullException(nameof(icon));
 
-        var result = _icons.TryAdd(icon.Path, icon);
+        var result = _icons.TryAdd(icon.FullPath, icon);
         return Task.FromResult(result);
     }
 
@@ -51,7 +51,7 @@ public class DesktopIconService : IDesktopIconService
         if (icon == null)
             throw new ArgumentNullException(nameof(icon));
 
-        var result = _icons.TryUpdate(icon.Path, icon, _icons[icon.Path]);
+        var result = _icons.TryUpdate(icon.FullPath, icon, _icons[icon.FullPath]);
         return Task.FromResult(result);
     }
 

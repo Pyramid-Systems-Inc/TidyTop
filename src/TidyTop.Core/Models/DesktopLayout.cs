@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace TidyTop.Core.Models
 {
@@ -11,7 +12,7 @@ namespace TidyTop.Core.Models
         /// <summary>
         /// Gets or sets the unique identifier for the layout
         /// </summary>
-        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public Guid Id { get; set; } = Guid.NewGuid();
 
         /// <summary>
         /// Gets or sets the name of the layout
@@ -36,7 +37,7 @@ namespace TidyTop.Core.Models
         /// <summary>
         /// Gets or sets the desktop resolution when this layout was saved
         /// </summary>
-        public Size DesktopResolution { get; set; }
+        public Size DesktopResolution { get; set; } = new Size(1920, 1080);
 
         /// <summary>
         /// Gets or sets the date when this layout was created
@@ -71,7 +72,7 @@ namespace TidyTop.Core.Models
         {
             return new DesktopLayout
             {
-                Id = Guid.NewGuid().ToString(),
+                Id = Guid.NewGuid(),
                 Name = $"{Name} (Copy)",
                 Description = Description,
                 Fences = Fences.ConvertAll(f => CloneFence(f)),
@@ -94,7 +95,7 @@ namespace TidyTop.Core.Models
         {
             return new Fence
             {
-                Id = Guid.NewGuid().ToString(),
+                Id = Guid.NewGuid(),
                 Title = fence.Title,
                 Position = fence.Position,
                 Size = fence.Size,

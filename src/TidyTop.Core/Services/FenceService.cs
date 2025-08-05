@@ -40,15 +40,16 @@ public class FenceService : IFenceService
         if (fence == null)
             throw new ArgumentNullException(nameof(fence));
 
-        fence.Id = fence.Id == Guid.Empty ? Guid.NewGuid() : fence.Id;
-        var result = _fences.TryAdd(fence.Id, fence);
+        Guid fenceId = string.IsNullOrEmpty(fence.Id) ? Guid.NewGuid() : Guid.Parse(fence.Id);
+        fence.Id = fenceId.ToString();
+        var result = _fences.TryAdd(fenceId, fence);
         
         if (result)
         {
-            _fenceIcons.TryAdd(fence.Id, new ConcurrentDictionary<string, DesktopIcon>());
+            _fenceIcons.TryAdd(fenceId, new ConcurrentDictionary<string, DesktopIcon>());
         }
 
-        return Task.FromResult(fence.Id);
+        return Task.FromResult(fenceId);
     }
 
     /// <inheritdoc/>
@@ -111,8 +112,7 @@ public class FenceService : IFenceService
         if (fence == null)
             return false;
 
-        fence.X = x;
-        fence.Y = y;
+        fence.Position = new System.Drawing.Point(x, y);
         return await UpdateFenceAsync(fence);
     }
 
@@ -123,8 +123,7 @@ public class FenceService : IFenceService
         if (fence == null)
             return false;
 
-        fence.Width = width;
-        fence.Height = height;
+        fence.Size = new System.Drawing.Size(width, height);
         return await UpdateFenceAsync(fence);
     }
 }
