@@ -3,6 +3,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:TidyTop.App.ViewModels"
+        xmlns:models="clr-namespace:TidyTop.Core.Models"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="TidyTop.App.Views.MainWindow"
         Title="TidyTop"
@@ -16,8 +17,7 @@
         CanResize="False"
         ShowInTaskbar="False"
         Topmost="True"
-        Focusable="True"
-        HitTestVisible="False">
+        Focusable="True">
     
     <Window.Styles>
         <Style Selector="Window">
@@ -41,16 +41,15 @@
             </ItemsControl.ItemsPanel>
             
             <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Border Width="{Binding Size.Width}"
+                <DataTemplate x:DataType="models:Fence">
+                    <Border Width="{Binding Size.Width}" 
                             Height="{Binding Size.Height}"
                             Background="{Binding BackgroundColor}"
                             BorderBrush="{Binding BorderColor}"
                             BorderThickness="{Binding BorderWidth}"
                             CornerRadius="{Binding CornerRadius}"
                             Opacity="{Binding Opacity}"
-                            IsVisible="{Binding IsVisible}"
-                            HitTestVisible="True">
+                            IsVisible="{Binding IsVisible}">
                         <Canvas.Left>
                             <Binding Path="Position.X"/>
                         </Canvas.Left>
@@ -66,12 +65,10 @@
                             
                             <!-- Fence Header -->
                             <Border Grid.Row="0" 
-                                    Background="{Binding HeaderColor}" 
+                                    Background="{Binding TitleColor}" 
                                     CornerRadius="5,5,0,0"
-                                    Padding="5"
-                                    MouseDown="OnFenceHeaderMouseDown"
-                                    Tag="{Binding .}">
-                                <TextBlock Text="{Binding Title}"
+                                    Padding="5">
+                                <TextBlock Text="{Binding Title}" 
                                            FontWeight="Bold"
                                            Foreground="{Binding TitleColor}"/>
                             </Border>
@@ -87,21 +84,18 @@
                                 </ItemsControl.ItemsPanel>
                                 
                                 <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border Width="48"
-                                                Height="48"
+                                    <DataTemplate x:DataType="models:DesktopIcon">
+                                        <Border Width="48" 
+                                                Height="48" 
                                                 Margin="2"
                                                 Background="Transparent"
-                                                CornerRadius="3"
-                                                PointerPressed="OnIconPointerPressed"
-                                                Tag="{Binding .}"
-                                                HitTestVisible="True">
+                                                CornerRadius="3">
                                             <Grid>
-                                                <Image Source="{Binding Icon}"
+                                                <Image Source="{Binding Icon}" 
                                                        Stretch="Uniform"
-                                                       Width="32"
+                                                       Width="32" 
                                                        Height="32"/>
-                                                <TextBlock Text="{Binding Name}"
+                                                <TextBlock Text="{Binding Name}" 
                                                            FontSize="10"
                                                            TextWrapping="Wrap"
                                                            TextAlignment="Center"
@@ -124,19 +118,19 @@
                HorizontalAlignment="Right"
                VerticalAlignment="Top"
                Margin="10"
-               HitTestVisible="True">
-            <Border Background="White" 
-                    CornerRadius="5" 
+               DataContext="{Binding}">
+            <Border Background="White"
+                    CornerRadius="5"
                     Padding="10"
                     BoxShadow="0 2 10 0 #80000000">
                 <StackPanel Spacing="5">
-                    <Button Content="Toggle Visibility" 
+                    <Button Content="Toggle Visibility"
                             Command="{Binding ToggleVisibilityCommand}"/>
-                    <Button Content="Refresh Desktop" 
+                    <Button Content="Refresh Desktop"
                             Command="{Binding RefreshDesktopCommand}"/>
-                    <Button Content="Create Fence" 
+                    <Button Content="Create Fence"
                             Command="{Binding CreateFenceCommand}"/>
-                    <Button Content="Save Layout" 
+                    <Button Content="Save Layout"
                             Command="{Binding SaveLayoutCommand}"/>
                 </StackPanel>
             </Border>
