@@ -1,0 +1,141 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:TidyTop.App.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="TidyTop.App.Views.MainWindow"
+        Title="TidyTop"
+        Width="800" Height="600"
+        WindowState="Maximized"
+        Background="Transparent"
+        TransparencyLevelHint="Transparent"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
+        ExtendClientAreaTitleBarHeightHint="-1"
+        CanResize="False"
+        ShowInTaskbar="False"
+        Topmost="True"
+        Focusable="True">
+    
+    <Window.Styles>
+        <Style Selector="Window">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Opacity" Value="{Binding Opacity}"/>
+            <Setter Property="IsVisible" Value="{Binding IsVisible}"/>
+        </Style>
+    </Window.Styles>
+    
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+    
+    <Grid>
+        <!-- Main content area for desktop overlay -->
+        <ItemsControl Items="{Binding Fences}" Margin="10">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Canvas/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Border Width="{Binding Width}" 
+                            Height="{Binding Height}"
+                            Background="{Binding BackgroundColor}"
+                            BorderBrush="{Binding BorderColor}"
+                            BorderThickness="{Binding BorderThickness}"
+                            CornerRadius="5"
+                            Opacity="{Binding Opacity}"
+                            IsVisible="{Binding IsVisible}">
+                        <Canvas.Left>
+                            <Binding Path="X"/>
+                        </Canvas.Left>
+                        <Canvas.Top>
+                            <Binding Path="Y"/>
+                        </Canvas.Top>
+                        
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            
+                            <!-- Fence Header -->
+                            <Border Grid.Row="0" 
+                                    Background="{Binding HeaderColor}" 
+                                    CornerRadius="5,5,0,0"
+                                    Padding="5"
+                                    MouseDown="OnFenceHeaderMouseDown"
+                                    Tag="{Binding .}">
+                                <TextBlock Text="{Binding Name}" 
+                                           FontWeight="Bold"
+                                           Foreground="{Binding TextColor}"/>
+                            </Border>
+                            
+                            <!-- Fence Content Area -->
+                            <ItemsControl Grid.Row="1" 
+                                          Items="{Binding Icons}"
+                                          Margin="5">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Width="48" 
+                                                Height="48" 
+                                                Margin="2"
+                                                Background="Transparent"
+                                                CornerRadius="3"
+                                                PointerPressed="OnIconPointerPressed"
+                                                Tag="{Binding .}">
+                                            <Grid>
+                                                <Image Source="{Binding IconPath}" 
+                                                       Stretch="Uniform"
+                                                       Width="32" 
+                                                       Height="32"/>
+                                                <TextBlock Text="{Binding Name}" 
+                                                           FontSize="10"
+                                                           TextWrapping="Wrap"
+                                                           TextAlignment="Center"
+                                                           MaxWidth="46"
+                                                           Margin="0,2,0,0"
+                                                           VerticalAlignment="Bottom"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        
+        <!-- Control Panel (initially hidden) -->
+        <Panel IsVisible="{Binding ShowControlPanel}" 
+               HorizontalAlignment="Right" 
+               VerticalAlignment="Top"
+               Margin="10">
+            <Border Background="White" 
+                    CornerRadius="5" 
+                    Padding="10"
+                    BoxShadow="0 2 10 0 #80000000">
+                <StackPanel Spacing="5">
+                    <Button Content="Toggle Visibility" 
+                            Command="{Binding ToggleVisibilityCommand}"/>
+                    <Button Content="Refresh Desktop" 
+                            Command="{Binding RefreshDesktopCommand}"/>
+                    <Button Content="Create Fence" 
+                            Command="{Binding CreateFenceCommand}"/>
+                    <Button Content="Save Layout" 
+                            Command="{Binding SaveLayoutCommand}"/>
+                </StackPanel>
+            </Border>
+        </Panel>
+    </Grid>
+</Window>

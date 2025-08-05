@@ -25,6 +25,7 @@ public class MainWindowViewModel : ViewModelBase
     private ObservableCollection<Fence> _fences;
     private DesktopLayout _currentLayout;
     private DesktopSettings _settings;
+    private bool _showControlPanel;
 
     public MainWindowViewModel(
         IDesktopIconService desktopIconService,
@@ -42,6 +43,7 @@ public class MainWindowViewModel : ViewModelBase
         RefreshDesktopCommand = ReactiveCommand.CreateFromTask(RefreshDesktopAsync);
         CreateFenceCommand = ReactiveCommand.Create(CreateNewFence);
         SaveLayoutCommand = ReactiveCommand.CreateFromTask(SaveCurrentLayoutAsync);
+        ToggleControlPanelCommand = ReactiveCommand.Create(ToggleControlPanel);
         
         // Initialize collections
         DesktopIcons = new ObservableCollection<DesktopIcon>();
@@ -50,6 +52,7 @@ public class MainWindowViewModel : ViewModelBase
         // Set initial state
         IsVisible = true;
         Opacity = 0.7; // Semi-transparent by default
+        ShowControlPanel = false; // Control panel hidden by default
         
         // Load settings and layout
         InitializeAsync();
@@ -91,10 +94,17 @@ public class MainWindowViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _settings, value);
     }
 
+    public bool ShowControlPanel
+    {
+        get => _showControlPanel;
+        set => this.RaiseAndSetIfChanged(ref _showControlPanel, value);
+    }
+
     public ReactiveCommand<Unit, Unit> ToggleVisibilityCommand { get; }
     public ReactiveCommand<Unit, Unit> RefreshDesktopCommand { get; }
     public ReactiveCommand<Unit, Unit> CreateFenceCommand { get; }
     public ReactiveCommand<Unit, Unit> SaveLayoutCommand { get; }
+    public ReactiveCommand<Unit, Unit> ToggleControlPanelCommand { get; }
 
     private async void InitializeAsync()
     {
@@ -138,6 +148,11 @@ public class MainWindowViewModel : ViewModelBase
     private void ToggleVisibility()
     {
         IsVisible = !IsVisible;
+    }
+
+    private void ToggleControlPanel()
+    {
+        ShowControlPanel = !ShowControlPanel;
     }
 
     private async Task RefreshDesktopAsync()
@@ -219,8 +234,4 @@ public class MainWindowViewModel : ViewModelBase
         return new Size(1920, 1080); // Default fallback
     }
 
-    public void Dispose()
-    {
-        // Clean up resources if needed
-    }
 }
