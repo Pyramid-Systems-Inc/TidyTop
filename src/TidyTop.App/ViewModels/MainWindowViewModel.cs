@@ -46,6 +46,13 @@ public class MainWindowViewModel : ViewModelBase
         CreateFenceCommand = ReactiveCommand.Create(CreateNewFence);
         SaveLayoutCommand = ReactiveCommand.CreateFromTask(SaveCurrentLayoutAsync);
         ToggleControlPanelCommand = ReactiveCommand.Create(ToggleControlPanel);
+        
+        // Fence commands
+        DeleteFenceCommand = ReactiveCommand.Create<Fence>(DeleteFence);
+        EditFenceCommand = ReactiveCommand.Create<Fence>(EditFence);
+        ChangeFenceColorCommand = ReactiveCommand.Create<Fence>(ChangeFenceColor);
+        AddIconsToFenceCommand = ReactiveCommand.Create<Fence>(AddIconsToFence);
+        AutoArrangeFenceCommand = ReactiveCommand.Create<Fence>(AutoArrangeFence);
 
         // Initialize collections
         DesktopIcons = new ObservableCollection<DesktopIcon>();
@@ -117,6 +124,13 @@ public class MainWindowViewModel : ViewModelBase
     public ReactiveCommand<Unit, Unit> CreateFenceCommand { get; }
     public ReactiveCommand<Unit, Unit> SaveLayoutCommand { get; }
     public ReactiveCommand<Unit, Unit> ToggleControlPanelCommand { get; }
+    
+    // Fence Commands
+    public ReactiveCommand<Fence, Unit> DeleteFenceCommand { get; }
+    public ReactiveCommand<Fence, Unit> EditFenceCommand { get; }
+    public ReactiveCommand<Fence, Unit> ChangeFenceColorCommand { get; }
+    public ReactiveCommand<Fence, Unit> AddIconsToFenceCommand { get; }
+    public ReactiveCommand<Fence, Unit> AutoArrangeFenceCommand { get; }
 
     private async void InitializeAsync()
     {
@@ -237,5 +251,37 @@ public class MainWindowViewModel : ViewModelBase
         }
         
         return new System.Drawing.Size(1920, 1080); // Default fallback
+    }
+    
+    private void DeleteFence(Fence? fence)
+    {
+        if (fence != null)
+        {
+            Fences.Remove(fence);
+        }
+    }
+
+    private void EditFence(Fence? fence)
+    {
+        // TODO: Implement a dialog or view for editing fence properties
+        Console.WriteLine($"Editing fence: {fence?.Title}");
+    }
+
+    private void ChangeFenceColor(Fence? fence)
+    {
+        // TODO: Implement a color picker dialog
+        Console.WriteLine($"Changing color for fence: {fence?.Title}");
+    }
+
+    private void AddIconsToFence(Fence? fence)
+    {
+        // TODO: Implement a file picker to add icons to the fence
+        Console.WriteLine($"Adding icons to fence: {fence?.Title}");
+    }
+
+    private void AutoArrangeFence(Fence? fence)
+    {
+        // TODO: Implement logic to automatically arrange icons within the fence
+        Console.WriteLine($"Auto-arranging icons in fence: {fence?.Title}");
     }
 }

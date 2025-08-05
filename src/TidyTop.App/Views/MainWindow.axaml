@@ -119,12 +119,12 @@
                             <Flyout>
                                 <StackPanel Spacing="5">
                                     <TextBlock Text="Fence Options" FontWeight="Bold"/>
-                                    <Button Content="Edit Fence" Command="{Binding EditFenceCommand}"/>
-                                    <Button Content="Delete Fence" Command="{Binding DeleteFenceCommand}"/>
-                                    <Button Content="Change Color" Command="{Binding ChangeFenceColorCommand}"/>
+                                    <Button Content="Edit Fence" Command="{Binding $parent[Window].DataContext.EditFenceCommand}" CommandParameter="{Binding}"/>
+                                    <Button Content="Delete Fence" Command="{Binding $parent[Window].DataContext.DeleteFenceCommand}" CommandParameter="{Binding}"/>
+                                    <Button Content="Change Color" Command="{Binding $parent[Window].DataContext.ChangeFenceColorCommand}" CommandParameter="{Binding}"/>
                                     <Separator/>
-                                    <Button Content="Add Icons" Command="{Binding AddIconsToFenceCommand}"/>
-                                    <Button Content="Auto-Arrange" Command="{Binding AutoArrangeFenceCommand}"/>
+                                    <Button Content="Add Icons" Command="{Binding $parent[Window].DataContext.AddIconsToFenceCommand}" CommandParameter="{Binding}"/>
+                                    <Button Content="Auto-Arrange" Command="{Binding $parent[Window].DataContext.AutoArrangeFenceCommand}" CommandParameter="{Binding}"/>
                                 </StackPanel>
                             </Flyout>
                         </Border.ContextFlyout>
