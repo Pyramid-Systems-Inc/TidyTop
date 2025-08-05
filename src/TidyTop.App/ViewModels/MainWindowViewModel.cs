@@ -101,7 +101,15 @@ public class MainWindowViewModel : ViewModelBase
     public bool ShowControlPanel
     {
         get => _showControlPanel;
-        set => this.RaiseAndSetIfChanged(ref _showControlPanel, value);
+        set
+        {
+            this.RaiseAndSetIfChanged(ref _showControlPanel, value);
+            // Make the window interactive when control panel is shown
+            if (value)
+            {
+                // This will be handled by the view's UpdateClickThroughMode method
+            }
+        }
     }
 
     public ReactiveCommand<Unit, Unit> ToggleVisibilityCommand { get; }

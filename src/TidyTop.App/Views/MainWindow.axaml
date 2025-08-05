@@ -18,7 +18,10 @@
         CanResize="False"
         ShowInTaskbar="False"
         Topmost="True"
-        Focusable="True">
+        Focusable="True"
+        PointerPressed="OnWindowPointerPressed"
+        PointerMoved="OnWindowPointerMoved"
+        PointerReleased="OnWindowPointerReleased">
 
     <Window.Styles>
         <Style Selector="Window">
@@ -43,14 +46,15 @@
             
             <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="models:Fence">
-                    <Border Width="{Binding Size.Width}" 
+                    <Border Width="{Binding Size.Width}"
                             Height="{Binding Size.Height}"
                             Background="{Binding BackgroundColor, Converter={StaticResource ColorToBrushConverter}}"
                             BorderBrush="{Binding BorderColor, Converter={StaticResource ColorToBrushConverter}}"
                             BorderThickness="{Binding BorderWidth}"
                             CornerRadius="{Binding CornerRadius}"
                             Opacity="{Binding Opacity}"
-                            IsVisible="{Binding IsVisible}">
+                            IsVisible="{Binding IsVisible}"
+                            PointerPressed="Fence_PointerPressed">
                         <Canvas.Left>
                             <Binding Path="Position.X"/>
                         </Canvas.Left>
@@ -65,17 +69,17 @@
                             </Grid.RowDefinitions>
                             
                             <!-- Fence Header -->
-                            <Border Grid.Row="0" 
-                                    Background="{Binding TitleColor, Converter={StaticResource ColorToBrushConverter}}" 
+                            <Border Grid.Row="0"
+                                    Background="{Binding TitleColor, Converter={StaticResource ColorToBrushConverter}}"
                                     CornerRadius="5,5,0,0"
                                     Padding="5">
-                                <TextBlock Text="{Binding Title}" 
+                                <TextBlock Text="{Binding Title}"
                                            FontWeight="Bold"
                                            Foreground="Black"/>
                             </Border>
                             
                             <!-- Fence Content Area -->
-                            <ItemsControl Grid.Row="1" 
+                            <ItemsControl Grid.Row="1"
                                           ItemsSource="{Binding Icons}"
                                           Margin="5">
                                 <ItemsControl.ItemsPanel>
@@ -86,17 +90,18 @@
                                 
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate x:DataType="models:DesktopIcon">
-                                        <Border Width="48" 
-                                                Height="48" 
+                                        <Border Width="48"
+                                                Height="48"
                                                 Margin="2"
                                                 Background="Transparent"
-                                                CornerRadius="3">
+                                                CornerRadius="3"
+                                                PointerPressed="Icon_PointerPressed">
                                             <Grid>
-                                                <Image Source="{Binding Icon, Converter={StaticResource ByteArrayToBitmapConverter}}" 
+                                                <Image Source="{Binding Icon, Converter={StaticResource ByteArrayToBitmapConverter}}"
                                                        Stretch="Uniform"
-                                                       Width="32" 
+                                                       Width="32"
                                                        Height="32"/>
-                                                <TextBlock Text="{Binding Name}" 
+                                                <TextBlock Text="{Binding Name}"
                                                            FontSize="10"
                                                            TextWrapping="Wrap"
                                                            TextAlignment="Center"
@@ -109,6 +114,20 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                         </Grid>
+                        
+                        <Border.ContextFlyout>
+                            <Flyout>
+                                <StackPanel Spacing="5">
+                                    <TextBlock Text="Fence Options" FontWeight="Bold"/>
+                                    <Button Content="Edit Fence" Command="{Binding EditFenceCommand}"/>
+                                    <Button Content="Delete Fence" Command="{Binding DeleteFenceCommand}"/>
+                                    <Button Content="Change Color" Command="{Binding ChangeFenceColorCommand}"/>
+                                    <Separator/>
+                                    <Button Content="Add Icons" Command="{Binding AddIconsToFenceCommand}"/>
+                                    <Button Content="Auto-Arrange" Command="{Binding AutoArrangeFenceCommand}"/>
+                                </StackPanel>
+                            </Flyout>
+                        </Border.ContextFlyout>
                     </Border>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
