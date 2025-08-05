@@ -34,13 +34,13 @@
 
     <Grid>
         <!-- Main content area for desktop overlay -->
-        <ItemsControl Items="{Binding Fences}" Margin="10">
+        <ItemsControl ItemsSource="{Binding Fences}" Margin="10">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <Canvas/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
-
+            
             <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="models:Fence">
                     <Border Width="{Binding Size.Width}" 
@@ -57,13 +57,13 @@
                         <Canvas.Top>
                             <Binding Path="Position.Y"/>
                         </Canvas.Top>
-
+                        
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
-
+                            
                             <!-- Fence Header -->
                             <Border Grid.Row="0" 
                                     Background="{Binding TitleColor, Converter={StaticResource ColorToBrushConverter}}" 
@@ -73,17 +73,17 @@
                                            FontWeight="Bold"
                                            Foreground="Black"/>
                             </Border>
-
+                            
                             <!-- Fence Content Area -->
                             <ItemsControl Grid.Row="1" 
-                                          Items="{Binding Icons}"
+                                          ItemsSource="{Binding Icons}"
                                           Margin="5">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <WrapPanel Orientation="Horizontal"/>
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
-
+                                
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate x:DataType="models:DesktopIcon">
                                         <Border Width="48" 
@@ -113,7 +113,7 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-
+        
         <!-- Control Panel (initially hidden) -->
         <Panel IsVisible="{Binding ShowControlPanel}"
                HorizontalAlignment="Right"

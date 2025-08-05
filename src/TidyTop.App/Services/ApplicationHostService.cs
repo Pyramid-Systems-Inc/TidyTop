@@ -102,6 +102,6 @@ public class ApplicationHostService : IHostedService
     /// <returns>An enumeration of service objects of the specified type</returns>
     public IEnumerable<object> GetServices(Type serviceType)
     {
-        return _serviceProvider.GetServices(serviceType);
+        return _serviceProvider.GetServices(serviceType).Where(s => s is not null)!;
     }
 }

@@ -46,18 +46,20 @@ public class MainWindowViewModel : ViewModelBase
         CreateFenceCommand = ReactiveCommand.Create(CreateNewFence);
         SaveLayoutCommand = ReactiveCommand.CreateFromTask(SaveCurrentLayoutAsync);
         ToggleControlPanelCommand = ReactiveCommand.Create(ToggleControlPanel);
-        
+
         // Initialize collections
         DesktopIcons = new ObservableCollection<DesktopIcon>();
         Fences = new ObservableCollection<Fence>();
-        
+
         // Set initial state
         IsVisible = true;
         Opacity = 0.7; // Semi-transparent by default
         ShowControlPanel = false; // Control panel hidden by default
-        
+
         // Load settings and layout
         InitializeAsync();
+        
+        CreateNewFence(); // Create a default fence on startup
     }
 
     public bool IsVisible
