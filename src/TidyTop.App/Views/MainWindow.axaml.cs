@@ -14,7 +14,7 @@ namespace TidyTop.App.Views;
 
 public partial class MainWindow : Window
 {
-    private MainWindowViewModel ViewModel => DataContext as MainWindowViewModel;
+    private MainWindowViewModel? ViewModel => DataContext as MainWindowViewModel;
     private bool _isDragging;
     private Point _dragStartPoint;
     private Fence? _draggedFence;

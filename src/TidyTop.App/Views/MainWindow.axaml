@@ -3,9 +3,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:TidyTop.App.ViewModels"
-        xmlns:models="clr-namespace:TidyTop.Core.Models"
+        xmlns:models="clr-namespace:TidyTop.Core.Models;assembly=TidyTop.Core"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="TidyTop.App.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
         Title="TidyTop"
         Width="800" Height="600"
         WindowState="Maximized"
@@ -18,7 +19,7 @@
         ShowInTaskbar="False"
         Topmost="True"
         Focusable="True">
-    
+
     <Window.Styles>
         <Style Selector="Window">
             <Setter Property="Background" Value="Transparent"/>
@@ -26,11 +27,11 @@
             <Setter Property="IsVisible" Value="{Binding IsVisible}"/>
         </Style>
     </Window.Styles>
-    
+
     <Design.DataContext>
         <vm:MainWindowViewModel/>
     </Design.DataContext>
-    
+
     <Grid>
         <!-- Main content area for desktop overlay -->
         <ItemsControl Items="{Binding Fences}" Margin="10">
@@ -39,13 +40,13 @@
                     <Canvas/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
-            
+
             <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="models:Fence">
                     <Border Width="{Binding Size.Width}" 
                             Height="{Binding Size.Height}"
-                            Background="{Binding BackgroundColor}"
-                            BorderBrush="{Binding BorderColor}"
+                            Background="{Binding BackgroundColor, Converter={StaticResource ColorToBrushConverter}}"
+                            BorderBrush="{Binding BorderColor, Converter={StaticResource ColorToBrushConverter}}"
                             BorderThickness="{Binding BorderWidth}"
                             CornerRadius="{Binding CornerRadius}"
                             Opacity="{Binding Opacity}"
@@ -56,23 +57,23 @@
                         <Canvas.Top>
                             <Binding Path="Position.Y"/>
                         </Canvas.Top>
-                        
+
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
-                            
+
                             <!-- Fence Header -->
                             <Border Grid.Row="0" 
-                                    Background="{Binding TitleColor}" 
+                                    Background="{Binding TitleColor, Converter={StaticResource ColorToBrushConverter}}" 
                                     CornerRadius="5,5,0,0"
                                     Padding="5">
                                 <TextBlock Text="{Binding Title}" 
                                            FontWeight="Bold"
-                                           Foreground="{Binding TitleColor}"/>
+                                           Foreground="Black"/>
                             </Border>
-                            
+
                             <!-- Fence Content Area -->
                             <ItemsControl Grid.Row="1" 
                                           Items="{Binding Icons}"
@@ -82,7 +83,7 @@
                                         <WrapPanel Orientation="Horizontal"/>
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
-                                
+
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate x:DataType="models:DesktopIcon">
                                         <Border Width="48" 
@@ -91,7 +92,7 @@
                                                 Background="Transparent"
                                                 CornerRadius="3">
                                             <Grid>
-                                                <Image Source="{Binding Icon}" 
+                                                <Image Source="{Binding Icon, Converter={StaticResource ByteArrayToBitmapConverter}}" 
                                                        Stretch="Uniform"
                                                        Width="32" 
                                                        Height="32"/>
@@ -112,13 +113,12 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-        
+
         <!-- Control Panel (initially hidden) -->
         <Panel IsVisible="{Binding ShowControlPanel}"
                HorizontalAlignment="Right"
                VerticalAlignment="Top"
-               Margin="10"
-               DataContext="{Binding}">
+               Margin="10">
             <Border Background="White"
                     CornerRadius="5"
                     Padding="10"

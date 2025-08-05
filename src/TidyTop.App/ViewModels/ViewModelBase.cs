@@ -35,18 +35,18 @@ public class ViewModelBase : ReactiveObject, IDisposable
         protected set => this.RaiseAndSetIfChanged(ref _errorMessage, value);
     }
 
-    protected void SetBusy(string statusMessage = null)
+    protected void SetBusy(string? statusMessage = null)
     {
         IsBusy = true;
-        StatusMessage = statusMessage;
+        StatusMessage = statusMessage ?? string.Empty;
         HasErrors = false;
-        ErrorMessage = null;
+        ErrorMessage = string.Empty;
     }
 
-    protected void SetIdle(string statusMessage = null)
+    protected void SetIdle(string? statusMessage = null)
     {
         IsBusy = false;
-        StatusMessage = statusMessage;
+        StatusMessage = statusMessage ?? string.Empty;
     }
 
     protected void SetError(string errorMessage)
@@ -59,7 +59,7 @@ public class ViewModelBase : ReactiveObject, IDisposable
     protected void ClearError()
     {
         HasErrors = false;
-        ErrorMessage = null;
+        ErrorMessage = string.Empty;
     }
 
     public virtual void Dispose()

@@ -74,14 +74,14 @@ public class DesktopLayoutService : IDesktopLayoutService
     }
 
     /// <inheritdoc/>
-    public async Task<bool> UpdateLayoutAsync(DesktopLayout layout)
+    public Task<bool> UpdateLayoutAsync(DesktopLayout layout)
     {
         if (layout == null)
             throw new ArgumentNullException(nameof(layout));
 
         layout.ModifiedDate = DateTime.Now;
         var result = _layouts.TryUpdate(layout.Id, layout, _layouts[layout.Id]);
-        return result;
+        return Task.FromResult(result);
     }
 
     /// <inheritdoc/>

@@ -84,13 +84,13 @@ public class MainWindowViewModel : ViewModelBase
         set => this.RaiseAndSetIfChanged(ref _fences, value);
     }
 
-    public DesktopLayout CurrentLayout
+    public DesktopLayout? CurrentLayout
     {
         get => _currentLayout;
         set => this.RaiseAndSetIfChanged(ref _currentLayout, value);
     }
 
-    public DesktopSettings Settings
+    public DesktopSettings? Settings
     {
         get => _settings;
         set => this.RaiseAndSetIfChanged(ref _settings, value);
@@ -228,5 +228,4 @@ public class MainWindowViewModel : ViewModelBase
         
         return new System.Drawing.Size(1920, 1080); // Default fallback
     }
-
 }
