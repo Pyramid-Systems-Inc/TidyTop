@@ -3,238 +3,387 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="clr-namespace:TidyTop.App.ViewModels"
-        xmlns:models="clr-namespace:TidyTop.Core.Models;assembly=TidyTop.Core"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        mc:Ignorable="d" d:DesignWidth="1920" d:DesignHeight="1080"
         x:Class="TidyTop.App.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
-        Title="TidyTop"
-        Width="800" Height="600"
-        WindowState="Normal"
-        Background="Transparent"
-        TransparencyLevelHint="Transparent"
+        Title="TidyTop - Desktop Organizer"
+        WindowState="Maximized"
+        Background="#FF1E1E1E"
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaChromeHints="NoChrome"
         ExtendClientAreaTitleBarHeightHint="-1"
         CanResize="False"
-        ShowInTaskbar="False"
-        Topmost="True"
-        Focusable="True"
-        SystemDecorations="None"
-        PointerPressed="OnWindowPointerPressed"
-        PointerMoved="OnWindowPointerMoved"
-        PointerReleased="OnWindowPointerReleased">
-
-    <Window.Styles>
-        <Style Selector="Window">
-            <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Opacity" Value="{Binding Opacity}"/>
-            <Setter Property="IsVisible" Value="{Binding IsVisible}"/>
-        </Style>
-    </Window.Styles>
-
-    <Design.DataContext>
-        <vm:MainWindowViewModel/>
-    </Design.DataContext>
+        ShowInTaskbar="True"
+        Topmost="False">
 
     <Grid>
-        <!-- Unfenced desktop icons -->
-        <ItemsControl ItemsSource="{Binding DesktopIcons}" Name="UnfencedIconsControl">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <Canvas/>
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            
-            <ItemsControl.ItemTemplate>
-                <DataTemplate x:DataType="models:DesktopIcon">
-                    <Border Width="64"
-                            Height="64"
-                            Margin="2"
-                            Background="Transparent"
-                            CornerRadius="3"
-                            PointerPressed="Icon_PointerPressed">
-                        <Canvas.Left>
-                            <Binding Path="Position.X"/>
-                        </Canvas.Left>
-                        <Canvas.Top>
-                            <Binding Path="Position.Y"/>
-                        </Canvas.Top>
-                        
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="48"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-                            
-                            <Image Grid.Row="0"
-                                   Source="{Binding Icon, Converter={StaticResource ByteArrayToBitmapConverter}}"
-                                   Stretch="Uniform"
-                                   Width="48"
-                                   Height="48"/>
-                            <TextBlock Grid.Row="1"
-                                       Text="{Binding Name}"
-                                       FontSize="10"
-                                       TextWrapping="Wrap"
-                                       TextAlignment="Center"
-                                       MaxWidth="60"
-                                       Foreground="White"
-                                       Background="#80000000"
-                                       Padding="2"/>
-                        </Grid>
-                    </Border>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+        <!-- Background -->
+        <Rectangle Fill="#FF1E1E1E" />
         
-        <!-- Main content area for desktop overlay -->
-        <ItemsControl ItemsSource="{Binding Fences}" Margin="10">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <Canvas/>
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
+        <!-- Main Content Grid -->
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
             
-            <ItemsControl.ItemTemplate>
-                <DataTemplate x:DataType="models:Fence">
-                    <Border Width="{Binding Size.Width}"
-                            Height="{Binding Size.Height}"
-                            Background="{Binding BackgroundColor, Converter={StaticResource ColorToBrushConverter}}"
-                            BorderBrush="{Binding BorderColor, Converter={StaticResource ColorToBrushConverter}}"
-                            BorderThickness="{Binding BorderWidth}"
-                            CornerRadius="{Binding CornerRadius}"
-                            Opacity="{Binding Opacity}"
-                            IsVisible="{Binding IsVisible}"
-                            PointerPressed="Fence_PointerPressed">
-                        <Canvas.Left>
-                            <Binding Path="Position.X"/>
-                        </Canvas.Left>
-                        <Canvas.Top>
-                            <Binding Path="Position.Y"/>
-                        </Canvas.Top>
-                        
+            <!-- Header -->
+            <Border Grid.Row="0" 
+                    Background="#FF2D2D30" 
+                    CornerRadius="8" 
+                    Padding="15"
+                    Margin="0,0,0,20">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="🏠" FontSize="24" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <TextBlock Text="TidyTop Desktop Organizer" 
+                                   FontSize="18" 
+                                   FontWeight="Bold" 
+                                   Foreground="White" 
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10">
+                        <Button Content="🔄 Refresh" 
+                                Background="#FF0E639C" 
+                                Foreground="White" 
+                                Padding="10,5"
+                                CornerRadius="4"
+                                Click="RefreshButton_Click"/>
+                        <Button Content="➕ Add Box" 
+                                Background="#FF16537E" 
+                                Foreground="White" 
+                                Padding="10,5"
+                                CornerRadius="4"
+                                Click="AddBoxButton_Click"/>
+                        <Button Content="⚙️ Settings" 
+                                Background="#FF68217A" 
+                                Foreground="White" 
+                                Padding="10,5"
+                                CornerRadius="4"
+                                Click="SettingsButton_Click"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+            
+            <!-- Main Content Area -->
+            <ScrollViewer Grid.Row="1" 
+                          HorizontalScrollBarVisibility="Auto" 
+                          VerticalScrollBarVisibility="Auto">
+                <WrapPanel x:Name="BoxContainer" 
+                           Orientation="Horizontal" 
+                           Margin="10"
+                           ItemWidth="280"
+                           ItemHeight="320">
+                    
+                    <!-- Office Tools Box -->
+                    <Border Background="#FF2E7D32" 
+                            CornerRadius="12" 
+                            Margin="10" 
+                            Width="260" 
+                            Height="300"
+                            BoxShadow="0 4 20 0 #40000000">
                         <Grid>
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="50"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             
-                            <!-- Fence Header -->
-                            <Border Grid.Row="0"
-                                    Background="{Binding TitleColor, Converter={StaticResource ColorToBrushConverter}}"
-                                    CornerRadius="5,5,0,0"
-                                    Padding="5">
-                                <TextBlock Text="{Binding Title}"
-                                           FontWeight="Bold"
-                                           Foreground="Black"/>
+                            <!-- Box Header -->
+                            <Border Grid.Row="0" 
+                                    Background="#FF1B5E20" 
+                                    CornerRadius="12,12,0,0" 
+                                    Padding="15,10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <TextBlock Grid.Column="0" 
+                                               Text="📊" 
+                                               FontSize="20" 
+                                               VerticalAlignment="Center" 
+                                               Margin="0,0,8,0"/>
+                                    <TextBlock Grid.Column="1" 
+                                               Text="Office Tools" 
+                                               FontSize="14" 
+                                               FontWeight="Bold" 
+                                               Foreground="White" 
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2" 
+                                               Text="(0)" 
+                                               FontSize="12" 
+                                               Foreground="#FFB0BEC5" 
+                                               VerticalAlignment="Center"/>
+                                </Grid>
                             </Border>
                             
-                            <!-- Fence Content Area -->
-                            <ItemsControl Grid.Row="1"
-                                          ItemsSource="{Binding Icons}"
-                                          Margin="5">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <WrapPanel Orientation="Horizontal"/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate x:DataType="models:DesktopIcon">
-                                        <Border Width="48"
-                                                Height="48"
-                                                Margin="2"
-                                                Background="Transparent"
-                                                CornerRadius="3"
-                                                PointerPressed="Icon_PointerPressed">
-                                            <Grid>
-                                                <Image Source="{Binding Icon, Converter={StaticResource ByteArrayToBitmapConverter}}"
-                                                       Stretch="Uniform"
-                                                       Width="32"
-                                                       Height="32"/>
-                                                <TextBlock Text="{Binding Name}"
-                                                           FontSize="10"
-                                                           TextWrapping="Wrap"
-                                                           TextAlignment="Center"
-                                                           MaxWidth="46"
-                                                           Margin="0,2,0,0"
-                                                           VerticalAlignment="Bottom"/>
-                                            </Grid>
-                                        </Border>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
+                            <!-- Box Content -->
+                            <Border Grid.Row="1" 
+                                    Background="#FF388E3C" 
+                                    CornerRadius="0,0,12,12" 
+                                    Padding="10">
+                                <TextBlock Text="Drag office applications here or they will be automatically organized" 
+                                           TextWrapping="Wrap" 
+                                           Foreground="White" 
+                                           FontSize="12" 
+                                           HorizontalAlignment="Center" 
+                                           VerticalAlignment="Center" 
+                                           TextAlignment="Center"
+                                           Opacity="0.7"/>
+                            </Border>
                         </Grid>
-                        
-                        <Border.ContextFlyout>
-                            <Flyout>
-                                <StackPanel Spacing="5">
-                                    <TextBlock Text="Fence Options" FontWeight="Bold"/>
-                                    <Button Content="Edit Fence" Command="{Binding $parent[Window].DataContext.EditFenceCommand}" CommandParameter="{Binding}"/>
-                                    <Button Content="Delete Fence" Command="{Binding $parent[Window].DataContext.DeleteFenceCommand}" CommandParameter="{Binding}"/>
-                                    <Button Content="Change Color" Command="{Binding $parent[Window].DataContext.ChangeFenceColorCommand}" CommandParameter="{Binding}"/>
-                                    <Separator/>
-                                    <Button Content="Add Icons" Command="{Binding $parent[Window].DataContext.AddIconsToFenceCommand}" CommandParameter="{Binding}"/>
-                                    <Button Content="Auto-Arrange" Command="{Binding $parent[Window].DataContext.AutoArrangeFenceCommand}" CommandParameter="{Binding}"/>
-                                </StackPanel>
-                            </Flyout>
-                        </Border.ContextFlyout>
                     </Border>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+                    
+                    <!-- Games Box -->
+                    <Border Background="#FF7B1FA2" 
+                            CornerRadius="12" 
+                            Margin="10" 
+                            Width="260" 
+                            Height="300"
+                            BoxShadow="0 4 20 0 #40000000">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="50"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            
+                            <!-- Box Header -->
+                            <Border Grid.Row="0" 
+                                    Background="#FF4A148C" 
+                                    CornerRadius="12,12,0,0" 
+                                    Padding="15,10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <TextBlock Grid.Column="0" 
+                                               Text="🎮" 
+                                               FontSize="20" 
+                                               VerticalAlignment="Center" 
+                                               Margin="0,0,8,0"/>
+                                    <TextBlock Grid.Column="1" 
+                                               Text="Games" 
+                                               FontSize="14" 
+                                               FontWeight="Bold" 
+                                               Foreground="White" 
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2" 
+                                               Text="(0)" 
+                                               FontSize="12" 
+                                               Foreground="#FFB0BEC5" 
+                                               VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+                            
+                            <!-- Box Content -->
+                            <Border Grid.Row="1" 
+                                    Background="#FF8E24AA" 
+                                    CornerRadius="0,0,12,12" 
+                                    Padding="10">
+                                <TextBlock Text="Games and entertainment applications will appear here automatically" 
+                                           TextWrapping="Wrap" 
+                                           Foreground="White" 
+                                           FontSize="12" 
+                                           HorizontalAlignment="Center" 
+                                           VerticalAlignment="Center" 
+                                           TextAlignment="Center"
+                                           Opacity="0.7"/>
+                            </Border>
+                        </Grid>
+                    </Border>
+                    
+                    <!-- Social & Communication Box -->
+                    <Border Background="#FF1976D2" 
+                            CornerRadius="12" 
+                            Margin="10" 
+                            Width="260" 
+                            Height="300"
+                            BoxShadow="0 4 20 0 #40000000">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="50"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            
+                            <!-- Box Header -->
+                            <Border Grid.Row="0" 
+                                    Background="#FF0D47A1" 
+                                    CornerRadius="12,12,0,0" 
+                                    Padding="15,10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <TextBlock Grid.Column="0" 
+                                               Text="💬" 
+                                               FontSize="20" 
+                                               VerticalAlignment="Center" 
+                                               Margin="0,0,8,0"/>
+                                    <TextBlock Grid.Column="1" 
+                                               Text="Social & Communication" 
+                                               FontSize="14" 
+                                               FontWeight="Bold" 
+                                               Foreground="White" 
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2" 
+                                               Text="(0)" 
+                                               FontSize="12" 
+                                               Foreground="#FFB0BEC5" 
+                                               VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+                            
+                            <!-- Box Content -->
+                            <Border Grid.Row="1" 
+                                    Background="#FF1E88E5" 
+                                    CornerRadius="0,0,12,12" 
+                                    Padding="10">
+                                <TextBlock Text="Chat apps, browsers, email clients will be organized here" 
+                                           TextWrapping="Wrap" 
+                                           Foreground="White" 
+                                           FontSize="12" 
+                                           HorizontalAlignment="Center" 
+                                           VerticalAlignment="Center" 
+                                           TextAlignment="Center"
+                                           Opacity="0.7"/>
+                            </Border>
+                        </Grid>
+                    </Border>
+                    
+                    <!-- Files & Documents Box -->
+                    <Border Background="#FF F57C00" 
+                            CornerRadius="12" 
+                            Margin="10" 
+                            Width="260" 
+                            Height="300"
+                            BoxShadow="0 4 20 0 #40000000">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="50"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            
+                            <!-- Box Header -->
+                            <Border Grid.Row="0" 
+                                    Background="#FFE65100" 
+                                    CornerRadius="12,12,0,0" 
+                                    Padding="15,10">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    
+                                    <TextBlock Grid.Column="0" 
+                                               Text="📁" 
+                                               FontSize="20" 
+                                               VerticalAlignment="Center" 
+                                               Margin="0,0,8,0"/>
+                                    <TextBlock Grid.Column="1" 
+                                               Text="Files & Documents" 
+                                               FontSize="14" 
+                                               FontWeight="Bold" 
+                                               Foreground="White" 
+                                               VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2" 
+                                               Text="(0)" 
+                                               FontSize="12" 
+                                               Foreground="#FFB0BEC5" 
+                                               VerticalAlignment="Center"/>
+                                </Grid>
+                            </Border>
+                            
+                            <!-- Box Content -->
+                            <Border Grid.Row="1" 
+                                    Background="#FFFF9800" 
+                                    CornerRadius="0,0,12,12" 
+                                    Padding="10">
+                                <TextBlock Text="File managers, text editors, and document viewers" 
+                                           TextWrapping="Wrap" 
+                                           Foreground="White" 
+                                           FontSize="12" 
+                                           HorizontalAlignment="Center" 
+                                           VerticalAlignment="Center" 
+                                           TextAlignment="Center"
+                                           Opacity="0.7"/>
+                            </Border>
+                        </Grid>
+                    </Border>
+                    
+                </WrapPanel>
+            </ScrollViewer>
+            
+            <!-- Status Bar -->
+            <Border Grid.Row="2" 
+                    Background="#FF2D2D30" 
+                    CornerRadius="8" 
+                    Padding="15,10"
+                    Margin="0,20,0,0">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="20">
+                        <TextBlock Text="📋 Status: Ready" 
+                                   Foreground="#FF90CAF9" 
+                                   FontSize="12" 
+                                   VerticalAlignment="Center"/>
+                        <TextBlock x:Name="StatusText"
+                                   Text="📦 0 applications organized" 
+                                   Foreground="#FFBDBDBD" 
+                                   FontSize="12" 
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                    
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="15">
+                        <TextBlock Text="💡 Double-click desktop to hide/show boxes" 
+                                   Foreground="#FF81C784" 
+                                   FontSize="11" 
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Text="⌨️ Press F1 for help" 
+                                   Foreground="#FFAED581" 
+                                   FontSize="11" 
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
         
-        <!-- Control Panel (initially hidden) -->
-        <Panel IsVisible="{Binding ShowControlPanel}"
-               HorizontalAlignment="Right"
-               VerticalAlignment="Top"
-               Margin="10">
-            <Border Background="White"
-                    CornerRadius="5"
-                    Padding="10"
-                    BoxShadow="0 2 10 0 #80000000"
-                    MaxWidth="300">
-                <StackPanel Spacing="5">
-                    <TextBlock Text="TidyTop Control Panel"
-                               FontWeight="Bold"
-                               FontSize="14"/>
-                    <Separator/>
-                    
-                    <StackPanel Spacing="3">
-                        <Button Content="Toggle Visibility (F12/Ctrl+H)"
-                                Command="{Binding ToggleVisibilityCommand}"/>
-                        <Button Content="Refresh Desktop (F11/Ctrl+R)"
-                                Command="{Binding RefreshDesktopCommand}"/>
-                        <Button Content="Create Fence (F10/Ctrl+N)"
-                                Command="{Binding CreateFenceCommand}"/>
-                        <Button Content="Save Layout (F9/Ctrl+S)"
-                                Command="{Binding SaveLayoutCommand}"/>
-                    </StackPanel>
-                    
-                    <Separator/>
-                    
-                    <StackPanel Spacing="2">
-                        <TextBlock Text="Hotkeys:" FontWeight="Bold" FontSize="12"/>
-                        <TextBlock Text="Tab - Show/Hide this panel" FontSize="10"/>
-                        <TextBlock Text="Right-click - Show this panel" FontSize="10"/>
-                        <TextBlock Text="Escape - Cancel action/hide panel" FontSize="10"/>
-                        <TextBlock Text="Ctrl+Space - Toggle panel" FontSize="10"/>
-                    </StackPanel>
-                    
-                    <Separator/>
-                    
-                    <StackPanel Spacing="2">
-                        <TextBlock Text="Instructions:" FontWeight="Bold" FontSize="12"/>
-                        <TextBlock Text="• Left-click and drag fences to move them"
-                                   FontSize="10" TextWrapping="Wrap"/>
-                        <TextBlock Text="• Right-click fences for options"
-                                   FontSize="10" TextWrapping="Wrap"/>
-                        <TextBlock Text="• Double-click icons to launch them"
-                                   FontSize="10" TextWrapping="Wrap"/>
-                        <TextBlock Text="• Drag icons between fences to organize"
-                                   FontSize="10" TextWrapping="Wrap"/>
-                    </StackPanel>
+        <!-- Loading Overlay -->
+        <Grid x:Name="LoadingOverlay" 
+              Background="#80000000" 
+              IsVisible="False">
+            <Border Background="#FF2D2D30" 
+                    CornerRadius="8" 
+                    Padding="20" 
+                    HorizontalAlignment="Center" 
+                    VerticalAlignment="Center">
+                <StackPanel Spacing="15" Orientation="Horizontal">
+                    <TextBlock Text="🔄" FontSize="20" VerticalAlignment="Center"/>
+                    <TextBlock Text="Scanning desktop applications..." 
+                               Foreground="White" 
+                               FontSize="14" 
+                               VerticalAlignment="Center"/>
                 </StackPanel>
             </Border>
-        </Panel>
+        </Grid>
     </Grid>
 </Window>
