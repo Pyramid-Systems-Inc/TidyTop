@@ -62,5 +62,15 @@ namespace TidyTop.Core.Models
         /// Gets or sets the file size in bytes
         /// </summary>
         public long FileSize { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this is a directory/folder
+        /// </summary>
+        public bool IsDirectory { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this icon is visible
+        /// </summary>
+        public bool IsVisible { get; set; } = true;
     }
 }

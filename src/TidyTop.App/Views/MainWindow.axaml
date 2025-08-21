@@ -9,7 +9,7 @@
         x:DataType="vm:MainWindowViewModel"
         Title="TidyTop"
         Width="800" Height="600"
-        WindowState="Maximized"
+        WindowState="Normal"
         Background="Transparent"
         TransparencyLevelHint="Transparent"
         ExtendClientAreaToDecorationsHint="True"
@@ -19,6 +19,7 @@
         ShowInTaskbar="False"
         Topmost="True"
         Focusable="True"
+        SystemDecorations="None"
         PointerPressed="OnWindowPointerPressed"
         PointerMoved="OnWindowPointerMoved"
         PointerReleased="OnWindowPointerReleased">
@@ -36,6 +37,55 @@
     </Design.DataContext>
 
     <Grid>
+        <!-- Unfenced desktop icons -->
+        <ItemsControl ItemsSource="{Binding DesktopIcons}" Name="UnfencedIconsControl">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <Canvas/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            
+            <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="models:DesktopIcon">
+                    <Border Width="64"
+                            Height="64"
+                            Margin="2"
+                            Background="Transparent"
+                            CornerRadius="3"
+                            PointerPressed="Icon_PointerPressed">
+                        <Canvas.Left>
+                            <Binding Path="Position.X"/>
+                        </Canvas.Left>
+                        <Canvas.Top>
+                            <Binding Path="Position.Y"/>
+                        </Canvas.Top>
+                        
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="48"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            
+                            <Image Grid.Row="0"
+                                   Source="{Binding Icon, Converter={StaticResource ByteArrayToBitmapConverter}}"
+                                   Stretch="Uniform"
+                                   Width="48"
+                                   Height="48"/>
+                            <TextBlock Grid.Row="1"
+                                       Text="{Binding Name}"
+                                       FontSize="10"
+                                       TextWrapping="Wrap"
+                                       TextAlignment="Center"
+                                       MaxWidth="60"
+                                       Foreground="White"
+                                       Background="#80000000"
+                                       Padding="2"/>
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        
         <!-- Main content area for desktop overlay -->
         <ItemsControl ItemsSource="{Binding Fences}" Margin="10">
             <ItemsControl.ItemsPanel>
@@ -141,16 +191,48 @@
             <Border Background="White"
                     CornerRadius="5"
                     Padding="10"
-                    BoxShadow="0 2 10 0 #80000000">
+                    BoxShadow="0 2 10 0 #80000000"
+                    MaxWidth="300">
                 <StackPanel Spacing="5">
-                    <Button Content="Toggle Visibility"
-                            Command="{Binding ToggleVisibilityCommand}"/>
-                    <Button Content="Refresh Desktop"
-                            Command="{Binding RefreshDesktopCommand}"/>
-                    <Button Content="Create Fence"
-                            Command="{Binding CreateFenceCommand}"/>
-                    <Button Content="Save Layout"
-                            Command="{Binding SaveLayoutCommand}"/>
+                    <TextBlock Text="TidyTop Control Panel"
+                               FontWeight="Bold"
+                               FontSize="14"/>
+                    <Separator/>
+                    
+                    <StackPanel Spacing="3">
+                        <Button Content="Toggle Visibility (F12/Ctrl+H)"
+                                Command="{Binding ToggleVisibilityCommand}"/>
+                        <Button Content="Refresh Desktop (F11/Ctrl+R)"
+                                Command="{Binding RefreshDesktopCommand}"/>
+                        <Button Content="Create Fence (F10/Ctrl+N)"
+                                Command="{Binding CreateFenceCommand}"/>
+                        <Button Content="Save Layout (F9/Ctrl+S)"
+                                Command="{Binding SaveLayoutCommand}"/>
+                    </StackPanel>
+                    
+                    <Separator/>
+                    
+                    <StackPanel Spacing="2">
+                        <TextBlock Text="Hotkeys:" FontWeight="Bold" FontSize="12"/>
+                        <TextBlock Text="Tab - Show/Hide this panel" FontSize="10"/>
+                        <TextBlock Text="Right-click - Show this panel" FontSize="10"/>
+                        <TextBlock Text="Escape - Cancel action/hide panel" FontSize="10"/>
+                        <TextBlock Text="Ctrl+Space - Toggle panel" FontSize="10"/>
+                    </StackPanel>
+                    
+                    <Separator/>
+                    
+                    <StackPanel Spacing="2">
+                        <TextBlock Text="Instructions:" FontWeight="Bold" FontSize="12"/>
+                        <TextBlock Text="• Left-click and drag fences to move them"
+                                   FontSize="10" TextWrapping="Wrap"/>
+                        <TextBlock Text="• Right-click fences for options"
+                                   FontSize="10" TextWrapping="Wrap"/>
+                        <TextBlock Text="• Double-click icons to launch them"
+                                   FontSize="10" TextWrapping="Wrap"/>
+                        <TextBlock Text="• Drag icons between fences to organize"
+                                   FontSize="10" TextWrapping="Wrap"/>
+                    </StackPanel>
                 </StackPanel>
             </Border>
         </Panel>

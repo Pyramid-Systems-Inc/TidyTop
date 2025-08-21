@@ -54,31 +54,34 @@ public partial class MainWindow : Window
 
     private void InitializeDesktopOverlay()
     {
-        // Set window to cover entire desktop
+        // Set window to cover entire screen (not just working area)
         if (Screens.Primary is { } screen)
         {
-            Width = screen.WorkingArea.Width;
-            Height = screen.WorkingArea.Height;
-            Position = new PixelPoint(screen.WorkingArea.X, screen.WorkingArea.Y);
+            Width = screen.Bounds.Width;
+            Height = screen.Bounds.Height;
+            Position = new PixelPoint(screen.Bounds.X, screen.Bounds.Y);
         }
         
         // Make window transparent
         Background = Avalonia.Media.Brushes.Transparent;
         TransparencyLevelHint = new[] { WindowTransparencyLevel.Transparent };
         
-        // Keep window on top
+        // Keep window on top but allow other windows to be focused
         Topmost = true;
         
         // Hide from taskbar
         ShowInTaskbar = false;
         
-        // Disable resizing
+        // Disable resizing and moving
         CanResize = false;
         
-        // Remove window chrome
+        // Remove window chrome completely
         ExtendClientAreaToDecorationsHint = true;
         ExtendClientAreaChromeHints = Avalonia.Platform.ExtendClientAreaChromeHints.NoChrome;
         ExtendClientAreaTitleBarHeightHint = -1;
+        
+        // Set window state
+        WindowState = WindowState.Normal;
         
         // Set initial click-through mode
         UpdateClickThroughMode();
@@ -88,15 +91,14 @@ public partial class MainWindow : Window
     {
         // Make the window click-through when not interacting with fences
         // This allows users to interact with their desktop normally
-        if (ViewModel != null && !ViewModel.ShowControlPanel)
+        if (ViewModel != null && !ViewModel.ShowControlPanel && !_isDragging)
         {
-            // Make window click-through by setting opacity to very low
-            // This is a workaround since SetHitTestVisible is not available
-            this.Opacity = 0.01;
+            // Make window slightly transparent when not interacting
+            this.Opacity = Math.Max(0.3, ViewModel.Opacity * 0.5);
         }
         else
         {
-            // Make window interactive when control panel is shown
+            // Make window fully visible when control panel is shown or dragging
             this.Opacity = ViewModel?.Opacity ?? 0.7;
         }
     }
@@ -171,27 +173,41 @@ public partial class MainWindow : Window
         
         if (_draggedFence != null)
         {
-            // Update fence position
-            var deltaX = currentPosition.X - _dragStartPoint.X;
-            var deltaY = currentPosition.Y - _dragStartPoint.Y;
-            
+            // Update fence position directly to current mouse position
             _draggedFence.Position = new System.Drawing.Point(
-                _draggedFence.Position.X + (int)deltaX,
-                _draggedFence.Position.Y + (int)deltaY);
-            
-            _dragStartPoint = currentPosition;
+                Math.Max(0, (int)(currentPosition.X - 100)), // Offset for better dragging feel
+                Math.Max(0, (int)(currentPosition.Y - 20))); // Adjust for title bar
+                
+            // Trigger UI update through property change notification
+            if (ViewModel != null)
+            {
+                // Force refresh of the fence collection to update UI
+                var fences = ViewModel.Fences.ToList();
+                ViewModel.Fences.Clear();
+                foreach (var fence in fences)
+                {
+                    ViewModel.Fences.Add(fence);
+                }
+            }
         }
         else if (_draggedIcon != null)
         {
             // Update icon position
-            var deltaX = currentPosition.X - _dragStartPoint.X;
-            var deltaY = currentPosition.Y - _dragStartPoint.Y;
-            
             _draggedIcon.Position = new System.Drawing.Point(
-                _draggedIcon.Position.X + (int)deltaX,
-                _draggedIcon.Position.Y + (int)deltaY);
-            
-            _dragStartPoint = currentPosition;
+                Math.Max(0, (int)(currentPosition.X - 32)), // Center on cursor
+                Math.Max(0, (int)(currentPosition.Y - 32)));
+                
+            // Trigger UI update through property change notification
+            if (ViewModel != null)
+            {
+                // Force refresh of the desktop icons collection to update UI
+                var icons = ViewModel.DesktopIcons.ToList();
+                ViewModel.DesktopIcons.Clear();
+                foreach (var icon in icons)
+                {
+                    ViewModel.DesktopIcons.Add(icon);
+                }
+            }
         }
     }
 
@@ -208,35 +224,96 @@ public partial class MainWindow : Window
     private void OnKeyDown(object? sender, KeyEventArgs e)
     {
         // Global keyboard shortcuts
-        switch (e.Key)
+        var modifiers = e.KeyModifiers;
+        
+        // Handle different key combinations
+        if (modifiers.HasFlag(KeyModifiers.Control))
         {
-            case Key.F12:
-                // Toggle visibility
-                ViewModel?.ToggleVisibilityCommand.Execute(Unit.Default);
-                break;
-                
-            case Key.F11:
-                // Refresh desktop
-                ViewModel?.RefreshDesktopCommand.Execute(Unit.Default);
-                break;
-                
-            case Key.F10:
-                // Create new fence
-                ViewModel?.CreateFenceCommand.Execute(Unit.Default);
-                break;
-                
-            case Key.F9:
-                // Save layout
-                ViewModel?.SaveLayoutCommand.Execute(Unit.Default);
-                break;
-                
-            case Key.Escape:
-                // Hide control panel
-                if (ViewModel != null && ViewModel.ShowControlPanel)
-                {
-                    ViewModel.ToggleControlPanelCommand.Execute(Unit.Default);
-                }
-                break;
+            switch (e.Key)
+            {
+                case Key.H:
+                    // Ctrl+H: Toggle visibility (like Hide/Show)
+                    ViewModel?.ToggleVisibilityCommand.Execute(Unit.Default);
+                    e.Handled = true;
+                    break;
+                    
+                case Key.R:
+                    // Ctrl+R: Refresh desktop
+                    ViewModel?.RefreshDesktopCommand.Execute(Unit.Default);
+                    e.Handled = true;
+                    break;
+                    
+                case Key.N:
+                    // Ctrl+N: Create new fence
+                    ViewModel?.CreateFenceCommand.Execute(Unit.Default);
+                    e.Handled = true;
+                    break;
+                    
+                case Key.S:
+                    // Ctrl+S: Save layout
+                    ViewModel?.SaveLayoutCommand.Execute(Unit.Default);
+                    e.Handled = true;
+                    break;
+                    
+                case Key.Space:
+                    // Ctrl+Space: Toggle control panel
+                    ViewModel?.ToggleControlPanelCommand.Execute(Unit.Default);
+                    e.Handled = true;
+                    break;
+            }
+        }
+        else
+        {
+            switch (e.Key)
+            {
+                case Key.F12:
+                    // F12: Toggle visibility
+                    ViewModel?.ToggleVisibilityCommand.Execute(Unit.Default);
+                    e.Handled = true;
+                    break;
+                    
+                case Key.F11:
+                    // F11: Refresh desktop
+                    ViewModel?.RefreshDesktopCommand.Execute(Unit.Default);
+                    e.Handled = true;
+                    break;
+                    
+                case Key.F10:
+                    // F10: Create new fence
+                    ViewModel?.CreateFenceCommand.Execute(Unit.Default);
+                    e.Handled = true;
+                    break;
+                    
+                case Key.F9:
+                    // F9: Save layout
+                    ViewModel?.SaveLayoutCommand.Execute(Unit.Default);
+                    e.Handled = true;
+                    break;
+                    
+                case Key.Escape:
+                    // Escape: Hide control panel or exit dragging mode
+                    if (_isDragging)
+                    {
+                        // Cancel dragging
+                        _isDragging = false;
+                        _draggedFence = null;
+                        _draggedIcon = null;
+                        UpdateClickThroughMode();
+                        e.Handled = true;
+                    }
+                    else if (ViewModel != null && ViewModel.ShowControlPanel)
+                    {
+                        ViewModel.ToggleControlPanelCommand.Execute(Unit.Default);
+                        e.Handled = true;
+                    }
+                    break;
+                    
+                case Key.Tab:
+                    // Tab: Toggle control panel
+                    ViewModel?.ToggleControlPanelCommand.Execute(Unit.Default);
+                    e.Handled = true;
+                    break;
+            }
         }
     }
     
@@ -320,12 +397,25 @@ public partial class MainWindow : Window
     {
         base.OnOpened(e);
         
-        // Ensure window is properly positioned and sized
+        // Ensure window covers the entire screen
         if (Screens.Primary is { } screen)
         {
-            Width = screen.WorkingArea.Width;
-            Height = screen.WorkingArea.Height;
-            Position = new PixelPoint(screen.WorkingArea.X, screen.WorkingArea.Y);
+            Width = screen.Bounds.Width;
+            Height = screen.Bounds.Height;
+            Position = new PixelPoint(screen.Bounds.X, screen.Bounds.Y);
+            
+            // Force window to stay on top
+            Topmost = false;
+            Topmost = true;
         }
+        
+        // Start loading desktop icons
+        Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            if (ViewModel != null)
+            {
+                ViewModel.RefreshDesktopCommand.Execute().Subscribe();
+            }
+        });
     }
 }

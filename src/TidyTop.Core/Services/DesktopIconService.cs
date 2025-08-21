@@ -1,4 +1,8 @@
 using System.Collections.Concurrent;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Runtime.InteropServices;
 using TidyTop.Core.Models;
 
 namespace TidyTop.Core.Services;
@@ -65,28 +69,226 @@ public class DesktopIconService : IDesktopIconService
     /// <inheritdoc/>
     public async Task RefreshDesktopIconsAsync()
     {
-        // In a real implementation, this would scan the desktop for icons
-        // For now, we'll just clear and reload from our cache
         _icons.Clear();
 
-        // TODO: Implement actual desktop scanning logic
-        // This would involve:
-        // 1. Getting the desktop path
-        // 2. Enumerating files and shortcuts
-        // 3. Creating DesktopIcon objects for each
-        // 4. Adding them to our dictionary
+        await Task.Run(() =>
+        {
+            try
+            {
+                // Get desktop folder path
+                var desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                var commonDesktopPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonDesktopDirectory);
+                
+                // Scan both user and common desktop folders
+                ScanDesktopFolder(desktopPath);
+                if (Directory.Exists(commonDesktopPath) && commonDesktopPath != desktopPath)
+                {
+                    ScanDesktopFolder(commonDesktopPath);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log error but don't throw to prevent application crash
+                Console.WriteLine($"Error refreshing desktop icons: {ex.Message}");
+            }
+        });
+    }
 
-        await Task.CompletedTask;
+    private void ScanDesktopFolder(string folderPath)
+    {
+        if (!Directory.Exists(folderPath))
+            return;
+
+        try
+        {
+            var files = Directory.GetFiles(folderPath);
+            var directories = Directory.GetDirectories(folderPath);
+
+            // Process files
+            foreach (var file in files)
+            {
+                try
+                {
+                    var icon = CreateDesktopIcon(file, false);
+                    if (icon != null)
+                    {
+                        _icons.TryAdd(icon.FullPath, icon);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error processing file {file}: {ex.Message}");
+                }
+            }
+
+            // Process directories
+            foreach (var directory in directories)
+            {
+                try
+                {
+                    var icon = CreateDesktopIcon(directory, true);
+                    if (icon != null)
+                    {
+                        _icons.TryAdd(icon.FullPath, icon);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error processing directory {directory}: {ex.Message}");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error scanning desktop folder {folderPath}: {ex.Message}");
+        }
+    }
+
+    private DesktopIcon? CreateDesktopIcon(string path, bool isDirectory)
+    {
+        try
+        {
+            var fileInfo = isDirectory ? null : new FileInfo(path);
+            var dirInfo = isDirectory ? new DirectoryInfo(path) : null;
+            
+            var name = isDirectory ? dirInfo!.Name : Path.GetFileNameWithoutExtension(path);
+            var extension = isDirectory ? "" : Path.GetExtension(path);
+            
+            var icon = new DesktopIcon
+            {
+                Name = name,
+                Extension = extension,
+                FullPath = path,
+                IsDirectory = isDirectory,
+                IsShortcut = !isDirectory && (extension.Equals(".lnk", StringComparison.OrdinalIgnoreCase) ||
+                                              extension.Equals(".url", StringComparison.OrdinalIgnoreCase)),
+                FileSize = isDirectory ? 0 : fileInfo?.Length ?? 0,
+                CreatedDate = isDirectory ? dirInfo!.CreationTime : fileInfo!.CreationTime,
+                ModifiedDate = isDirectory ? dirInfo!.LastWriteTime : fileInfo!.LastWriteTime,
+                Position = new System.Drawing.Point(0, 0), // Will be set by Windows desktop positioning
+                IsVisible = true
+            };
+
+            // Extract icon asynchronously
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    icon.Icon = await GetIconAsync(path);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error extracting icon for {path}: {ex.Message}");
+                }
+            });
+
+            return icon;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error creating desktop icon for {path}: {ex.Message}");
+            return null;
+        }
     }
 
     /// <inheritdoc/>
     public async Task<byte[]?> GetIconAsync(string path)
     {
-        // In a real implementation, this would extract the icon from the file
-        // For now, we'll return null
-        // TODO: Implement actual icon extraction logic
+        return await Task.Run(() =>
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(path) || !File.Exists(path) && !Directory.Exists(path))
+                    return null;
+
+                // Icon extraction is only supported on Windows
+                if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+                    return null;
+                }
+
+                Icon? icon = null;
+                
+                try
+                {
+                    if (Directory.Exists(path))
+                    {
+                        // Extract folder icon
+                        icon = ExtractFolderIcon();
+                    }
+                    else
+                    {
+                        // Extract file icon
+                        icon = Icon.ExtractAssociatedIcon(path);
+                    }
+
+                    if (icon != null)
+                    {
+                        using (icon)
+                        using (var bitmap = icon.ToBitmap())
+                        using (var stream = new MemoryStream())
+                        {
+                            bitmap.Save(stream, ImageFormat.Png);
+                            return stream.ToArray();
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error extracting icon from {path}: {ex.Message}");
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetIconAsync for {path}: {ex.Message}");
+                return null;
+            }
+        });
+    }
+
+    private static Icon? ExtractFolderIcon()
+    {
+        try
+        {
+            // Use Windows API to get standard folder icon
+            var shfi = new SHFILEINFO();
+            var result = SHGetFileInfo("folder", FILE_ATTRIBUTE_DIRECTORY, ref shfi, 
+                (uint)Marshal.SizeOf(shfi), SHGFI_ICON | SHGFI_USEFILEATTRIBUTES);
+            
+            if (result != IntPtr.Zero && shfi.hIcon != IntPtr.Zero)
+            {
+                var icon = Icon.FromHandle(shfi.hIcon);
+                return (Icon)icon.Clone(); // Clone to avoid handle issues
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error extracting folder icon: {ex.Message}");
+        }
         
-        await Task.CompletedTask;
         return null;
     }
+
+    // Windows API structures and constants for icon extraction
+    [StructLayout(LayoutKind.Sequential)]
+    private struct SHFILEINFO
+    {
+        public IntPtr hIcon;
+        public IntPtr iIcon;
+        public uint dwAttributes;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 260)]
+        public string szDisplayName;
+        [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 80)]
+        public string szTypeName;
+    }
+
+    [DllImport("shell32.dll")]
+    private static extern IntPtr SHGetFileInfo(string pszPath, uint dwFileAttributes, 
+        ref SHFILEINFO psfi, uint cbSizeFileInfo, uint uFlags);
+
+    private const uint SHGFI_ICON = 0x100;
+    private const uint SHGFI_USEFILEATTRIBUTES = 0x10;
+    private const uint FILE_ATTRIBUTE_DIRECTORY = 0x10;
 }
