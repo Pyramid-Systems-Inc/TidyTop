@@ -25,20 +25,11 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            // Create the main window with dependency injection support
+            // Create the main window
             var mainWindow = new Views.MainWindow();
             
-            // Set the data context with services if needed
-            if (AppHost != null)
-            {
-                var viewModel = new MainWindowViewModel(
-                    AppHost.GetService<IDesktopIconService>(),
-                    AppHost.GetService<IFenceService>(),
-                    AppHost.GetService<IDesktopLayoutService>(),
-                    AppHost.GetService<ISettingsService>());
-                
-                mainWindow.DataContext = viewModel;
-            }
+            // Set a simple data context
+            mainWindow.DataContext = new MainWindowViewModel();
             
             desktop.MainWindow = mainWindow;
         }

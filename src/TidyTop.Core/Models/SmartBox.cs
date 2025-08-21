@@ -140,9 +140,9 @@ namespace TidyTop.Core.Models
         public DateTime ModifiedDate { get; set; } = DateTime.Now;
 
         /// <summary>
-        /// Gets or sets custom rules for this box
+        /// Gets or sets custom rules for this box (implementation coming soon)
         /// </summary>
-        public List<OrganizationRule> CustomRules { get; set; } = new();
+        public List<string> CustomRules { get; set; } = new();
 
         /// <summary>
         /// Gets or sets the maximum number of icons to display (0 = unlimited)
@@ -210,12 +210,12 @@ namespace TidyTop.Core.Models
                     return true;
             }
 
-            // Check custom rules
-            foreach (var rule in CustomRules)
-            {
-                if (rule.Matches(icon))
-                    return true;
-            }
+            // Check custom rules (implementation coming soon)
+            // foreach (var rule in CustomRules)
+            // {
+            //     if (rule.Matches(icon))
+            //         return true;
+            // }
 
             return false;
         }

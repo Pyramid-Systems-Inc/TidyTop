@@ -96,7 +96,7 @@
                             </Grid.RowDefinitions>
                             
                             <!-- Box Header -->
-                            <Border Grid.Row="0" 
+                            <Border Grid.Row="0"
                                     Background="#FF1B5E20" 
                                     CornerRadius="12,12,0,0" 
                                     Padding="15,10">
@@ -115,7 +115,7 @@
                                     <TextBlock Grid.Column="1" 
                                                Text="Office Tools" 
                                                FontSize="14" 
-                                               FontWeight="Bold" 
+                                           FontWeight="Bold"
                                                Foreground="White" 
                                                VerticalAlignment="Center"/>
                                     <TextBlock Grid.Column="2" 
@@ -161,7 +161,7 @@
                                     Background="#FF4A148C" 
                                     CornerRadius="12,12,0,0" 
                                     Padding="15,10">
-                                <Grid>
+                                            <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"/>
                                         <ColumnDefinition Width="*"/>
@@ -193,12 +193,12 @@
                                     CornerRadius="0,0,12,12" 
                                     Padding="10">
                                 <TextBlock Text="Games and entertainment applications will appear here automatically" 
-                                           TextWrapping="Wrap" 
+                                                           TextWrapping="Wrap"
                                            Foreground="White" 
                                            FontSize="12" 
                                            HorizontalAlignment="Center" 
                                            VerticalAlignment="Center" 
-                                           TextAlignment="Center"
+                                                           TextAlignment="Center"
                                            Opacity="0.7"/>
                             </Border>
                         </Grid>
@@ -235,7 +235,7 @@
                                                VerticalAlignment="Center" 
                                                Margin="0,0,8,0"/>
                                     <TextBlock Grid.Column="1" 
-                                               Text="Social & Communication" 
+                                               Text="Social &amp; Communication" 
                                                FontSize="14" 
                                                FontWeight="Bold" 
                                                Foreground="White" 
@@ -245,8 +245,8 @@
                                                FontSize="12" 
                                                Foreground="#FFB0BEC5" 
                                                VerticalAlignment="Center"/>
-                                </Grid>
-                            </Border>
+                                            </Grid>
+                                        </Border>
                             
                             <!-- Box Content -->
                             <Border Grid.Row="1" 
@@ -266,7 +266,7 @@
                     </Border>
                     
                     <!-- Files & Documents Box -->
-                    <Border Background="#FF F57C00" 
+                    <Border Background="#FFF57C00" 
                             CornerRadius="12" 
                             Margin="10" 
                             Width="260" 
@@ -296,7 +296,7 @@
                                                VerticalAlignment="Center" 
                                                Margin="0,0,8,0"/>
                                     <TextBlock Grid.Column="1" 
-                                               Text="Files & Documents" 
+                                               Text="Files &amp; Documents" 
                                                FontSize="14" 
                                                FontWeight="Bold" 
                                                Foreground="White" 
